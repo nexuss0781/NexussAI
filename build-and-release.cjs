@@ -94,16 +94,78 @@ async function run() {
     // 2. Fetch or trigger EAS build
     console.log('[2/5] Coordinating EAS Cloud Android Build (APK preview)...');
     
+    let currentBuildId = null;
+    
+    try {
+      console.log('Checking for any active EAS builds...');
+      const listOutput = execSync('npx -y eas-cli build:list --platform android --limit 1 --json --non-interactive', {
+        cwd: nativeAppDir,
+        encoding: 'utf8',
+      });
+      const builds = JSON.parse(listOutput || '[]');
+      const latest = builds[0];
+      if (latest && (latest.status === 'IN_QUEUE' || latest.status === 'IN_PROGRESS')) {
+        console.log(`Found active build running on EAS: ${latest.id} (${latest.status}). Tracking this active build...`);
+        currentBuildId = latest.id;
+      }
+    } catch (e) {
+      console.log('Could not retrieve active build status:', e.message);
+    }
+    
+    if (!currentBuildId) {
+      console.log('No active builds found. Triggering a new EAS cloud build...');
+      try {
+        const buildOutput = execSync('npx -y eas-cli build --platform android --profile preview --non-interactive --no-wait --json', {
+          cwd: nativeAppDir,
+          encoding: 'utf8',
+        });
+        
+        try {
+          const buildResult = JSON.parse(buildOutput);
+          const buildsList = Array.isArray(buildResult) ? buildResult : (buildResult.builds || [buildResult]);
+          if (buildsList[0] && buildsList[0].id) {
+            currentBuildId = buildsList[0].id;
+            console.log(`Successfully triggered new EAS build. Build ID: ${currentBuildId}`);
+          }
+        } catch (jsonErr) {
+          console.log('Failed to parse build command JSON:', jsonErr.message);
+        }
+      } catch (e) {
+        console.log('Trigger build command executed, fetching new build ID from list...');
+      }
+      
+      if (!currentBuildId) {
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        try {
+          const listOutput = execSync('npx -y eas-cli build:list --platform android --limit 1 --json --non-interactive', {
+            cwd: nativeAppDir,
+            encoding: 'utf8',
+          });
+          const builds = JSON.parse(listOutput || '[]');
+          if (builds[0]) {
+            currentBuildId = builds[0].id;
+            console.log(`Retrieved triggered build ID from list: ${currentBuildId}`);
+          }
+        } catch (e) {
+          console.log('Error fetching latest build ID:', e.message);
+        }
+      }
+    }
+    
+    if (!currentBuildId) {
+      throw new Error('Failed to trigger or locate a valid EAS build to track.');
+    }
+    
     let apkUrl = null;
     let attempts = 0;
-    const maxAttempts = 60; // 15 minutes max (15s * 60)
+    const maxAttempts = 80; // 20 minutes max
     
     while (!apkUrl && attempts < maxAttempts) {
-      console.log(`Checking latest EAS build status (Attempt ${attempts + 1}/${maxAttempts})...`);
+      console.log(`Checking EAS build ${currentBuildId} status (Attempt ${attempts + 1}/${maxAttempts})...`);
       
       let listOutput;
       try {
-        listOutput = execSync('npx -y eas-cli build:list --platform android --limit 1 --json --non-interactive', {
+        listOutput = execSync('npx -y eas-cli build:list --platform android --limit 5 --json --non-interactive', {
           cwd: nativeAppDir,
           encoding: 'utf8',
         });
@@ -121,37 +183,29 @@ async function run() {
         console.log('Error parsing build list JSON:', e.message);
       }
       
-      const latestBuild = builds[0];
+      const targetBuild = builds.find(b => b.id === currentBuildId) || builds[0];
       
-      if (!latestBuild) {
-        console.log('No build found on EAS. Triggering a new cloud build...');
-        try {
-          execSync('npx -y eas-cli build --platform android --profile preview --non-interactive', {
-            cwd: nativeAppDir,
-            stdio: 'inherit',
-          });
-        } catch (e) {
-          console.log('Triggering build returned an error (it may have started anyway):', e.message);
-        }
+      if (!targetBuild) {
+        console.log(`Build ${currentBuildId} not found in latest list. Retrying in 15 seconds...`);
         await new Promise(resolve => setTimeout(resolve, 15000));
         attempts++;
         continue;
       }
       
-      console.log(`Latest Build ID: ${latestBuild.id} | Status: ${latestBuild.status}`);
+      console.log(`Build ${targetBuild.id} Status: ${targetBuild.status}`);
       
-      if (latestBuild.status === 'FINISHED') {
-        if (latestBuild.artifacts && latestBuild.artifacts.buildUrl) {
-          apkUrl = latestBuild.artifacts.buildUrl;
+      if (targetBuild.status === 'FINISHED') {
+        if (targetBuild.artifacts && targetBuild.artifacts.buildUrl) {
+          apkUrl = targetBuild.artifacts.buildUrl;
           console.log(`Successfully fetched APK url from finished EAS build: ${apkUrl}`);
         } else {
           console.log('Build finished but no artifacts/buildUrl found yet. Retrying...');
         }
-      } else if (latestBuild.status === 'FAILED') {
-        throw new Error(`EAS Build ${latestBuild.id} failed on Expo servers.`);
+      } else if (targetBuild.status === 'FAILED' || targetBuild.status === 'ERRORED' || targetBuild.status === 'CANCELED') {
+        throw new Error(`EAS Build ${targetBuild.id} ended with status ${targetBuild.status} on Expo servers.`);
       } else {
         // IN_QUEUE or IN_PROGRESS
-        console.log(`Build ${latestBuild.id} is currently ${latestBuild.status}. Waiting 15 seconds...`);
+        console.log(`Build ${targetBuild.id} is currently ${targetBuild.status}. Waiting 15 seconds...`);
       }
       
       if (!apkUrl) {
