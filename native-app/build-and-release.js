@@ -83,7 +83,7 @@ async function run() {
     // 1. Initialise EAS project if needed
     console.log('Registering/linking Expo project with EAS...');
     try {
-      execSync('npx -y eas-cli project:init --non-interactive', {
+      execSync('npx -y eas-cli project:init --non-interactive --force', {
         cwd: nativeAppDir,
         stdio: 'inherit',
       });
