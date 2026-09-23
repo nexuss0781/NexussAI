@@ -1,0 +1,10 @@
+[package]
+name = 'nexuss0781/nexussai'
+version = '0.1.6'
+description = 'Nexuss AI - High performance AI assistant web application'
+
+[dependencies]
+'wasmer/static-web-server' = '^1'
+
+[fs]
+'/public' = 'dist'

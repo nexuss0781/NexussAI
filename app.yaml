@@ -1,0 +1,5 @@
+kind: wasmer.io/App.v0
+name: nexussai
+owner: nexuss0781
+package: '.'
+app_id: da_KwGIWtMUpWzX

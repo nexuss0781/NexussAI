@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Nexuss AI",
+    "slug": "nexuss-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#020105"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nexuss.ai"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#020105"
+      },
+      "package": "com.nexuss.ai"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-updates"
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/46761446-1bee-469a-9c85-b47e780099b8"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "46761446-1bee-469a-9c85-b47e780099b8"
+      }
+    },
+    "owner": "nexuss-intelliegence"
+  }
+}

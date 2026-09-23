@@ -1,0 +1,6 @@
+{
+  "name": "Nexuss AI",
+  "description": "Nexuss AI is a minimal, elegant conversational workspace featuring deeper research, data synthesis, and creative brainstorming.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
