@@ -91,40 +91,77 @@ async function run() {
       console.log('EAS project init returned or already initialized:', e.message);
     }
 
-    // 2. Run EAS build
-    console.log('[2/5] Triggering EAS Cloud Android Build (APK preview)...');
-    console.log('This will build a high-performance APK on Expo EAS servers...');
+    // 2. Fetch or trigger EAS build
+    console.log('[2/5] Coordinating EAS Cloud Android Build (APK preview)...');
     
-    // Trigger the EAS build
-    const buildOutput = execSync('npx -y eas-cli build --platform android --profile preview --non-interactive --wait', {
-      cwd: nativeAppDir,
-      encoding: 'utf8',
-    });
-
-    console.log('EAS Build Output received successfully!');
-    
-    // Find the APK download URL from EAS output
-    // EAS prints something like: "Android app: https://expo.dev/artifacts/eas/..."
-    const apkUrlRegex = /(https:\/\/expo\.dev\/artifacts\/eas\/[^\s]+)/;
-    const match = buildOutput.match(apkUrlRegex);
     let apkUrl = null;
-
-    if (match && match[1]) {
-      apkUrl = match[1];
-      console.log(`Found APK download URL: ${apkUrl}`);
-    } else {
-      console.log('Could not parse APK URL directly from build output. Attempting to fetch build list...');
-      const listOutput = execSync('npx -y eas-cli build:list --platform android --limit 1 --json --non-interactive', {
-        cwd: nativeAppDir,
-        encoding: 'utf8',
-      });
-      const builds = JSON.parse(listOutput);
-      if (builds && builds.length > 0 && builds[0].artifacts && builds[0].artifacts.buildUrl) {
-        apkUrl = builds[0].artifacts.buildUrl;
-        console.log(`Successfully fetched APK url from EAS build history: ${apkUrl}`);
-      } else {
-        throw new Error('Could not retrieve compiled APK URL from EAS.');
+    let attempts = 0;
+    const maxAttempts = 60; // 15 minutes max (15s * 60)
+    
+    while (!apkUrl && attempts < maxAttempts) {
+      console.log(`Checking latest EAS build status (Attempt ${attempts + 1}/${maxAttempts})...`);
+      
+      let listOutput;
+      try {
+        listOutput = execSync('npx -y eas-cli build:list --platform android --limit 1 --json --non-interactive', {
+          cwd: nativeAppDir,
+          encoding: 'utf8',
+        });
+      } catch (e) {
+        console.log('Error fetching build list:', e.message);
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        attempts++;
+        continue;
       }
+      
+      let builds = [];
+      try {
+        builds = JSON.parse(listOutput);
+      } catch (e) {
+        console.log('Error parsing build list JSON:', e.message);
+      }
+      
+      const latestBuild = builds[0];
+      
+      if (!latestBuild) {
+        console.log('No build found on EAS. Triggering a new cloud build...');
+        try {
+          execSync('npx -y eas-cli build --platform android --profile preview --non-interactive', {
+            cwd: nativeAppDir,
+            stdio: 'inherit',
+          });
+        } catch (e) {
+          console.log('Triggering build returned an error (it may have started anyway):', e.message);
+        }
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        attempts++;
+        continue;
+      }
+      
+      console.log(`Latest Build ID: ${latestBuild.id} | Status: ${latestBuild.status}`);
+      
+      if (latestBuild.status === 'FINISHED') {
+        if (latestBuild.artifacts && latestBuild.artifacts.buildUrl) {
+          apkUrl = latestBuild.artifacts.buildUrl;
+          console.log(`Successfully fetched APK url from finished EAS build: ${apkUrl}`);
+        } else {
+          console.log('Build finished but no artifacts/buildUrl found yet. Retrying...');
+        }
+      } else if (latestBuild.status === 'FAILED') {
+        throw new Error(`EAS Build ${latestBuild.id} failed on Expo servers.`);
+      } else {
+        // IN_QUEUE or IN_PROGRESS
+        console.log(`Build ${latestBuild.id} is currently ${latestBuild.status}. Waiting 15 seconds...`);
+      }
+      
+      if (!apkUrl) {
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        attempts++;
+      }
+    }
+    
+    if (!apkUrl) {
+      throw new Error('EAS build tracking timed out.');
     }
 
     // 3. Download APK
