@@ -354,9 +354,10 @@ if (process.env.NODE_ENV !== 'production') {
   });
   app.use(vite.middlewares);
 } else {
-  app.use(express.static(path.resolve(__dirname, 'dist')));
+  const staticRoot = process.env.STATIC_DIR || path.resolve(__dirname, 'dist');
+  app.use(express.static(staticRoot));
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+    res.sendFile(path.join(staticRoot, 'index.html'));
   });
 }
 

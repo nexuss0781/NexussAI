@@ -3,15 +3,21 @@ name: nexussai
 owner: nexuss0781
 package: '.'
 app_id: da_KwGIWtMUpWzX
+annotations:
+  anybuild.run/config:
+    commands:
+      start: node server.js
+    edgejs_enable: true
+    edgejs_precompile: true
+    name: out
+    node_install_inputs: []
+    node_package_manager: npm
+    node_package_name: nexuss-ai
+    node_remove_native_binaries: true
+    node_server: express
+  anybuild.run/provider: node
+  anybuild.run/version: 0.28.4
+  wasmer.io/version: 7.4.1
 env:
   FILESYSTEM_KIT_URL: https://filesystem-kit.wasmer.app
-health_checks:
-  - http:
-      method: get
-      path: /api/health
-      interval: 30s
-      timeout: 10s
-      unhealthy_threshold: 2
-      healthy_threshold: 1
-      expected_status_codes:
-        - 200
+  STATIC_DIR: /public
