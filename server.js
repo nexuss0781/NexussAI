@@ -3,16 +3,16 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { GoogleGenAI } from "@google/genai";
 dotenv.config();
 var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 var app = express();
 var PORT = Number(process.env.PORT) || 3e3;
 app.use(express.json({ limit: "10mb" }));
-var getGeminiClient = () => {
+var getGeminiClient = async () => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
+  const { GoogleGenAI } = await import("@google/genai");
   return new GoogleGenAI({
     apiKey,
     httpOptions: {
@@ -117,7 +117,7 @@ app.post("/api/chat", async (req, res) => {
       actualModel = "gemini-3.8-flash";
       isWebGroundingNeeded = true;
     }
-    const ai = getGeminiClient();
+    const ai = await getGeminiClient();
     if (ai) {
       try {
         const defaultSystemInstruction = `You are Nexuss AI, a minimal, ultra-clean, and high-performance AI assistant.

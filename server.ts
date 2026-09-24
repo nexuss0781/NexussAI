@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleGenAI } from '@google/genai';
 
 dotenv.config();
 
@@ -15,9 +14,10 @@ const PORT = Number(process.env.PORT) || 3000;
 app.use(express.json({ limit: '10mb' }));
 
 // Helper to initialize Gemini client safely
-const getGeminiClient = () => {
+const getGeminiClient = async () => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
+  const { GoogleGenAI } = await import('@google/genai');
   return new GoogleGenAI({
     apiKey,
     httpOptions: {
@@ -127,7 +127,7 @@ app.post('/api/chat', async (req, res) => {
       isWebGroundingNeeded = true;
     }
 
-    const ai = getGeminiClient();
+    const ai = await getGeminiClient();
 
     if (ai) {
       try {
