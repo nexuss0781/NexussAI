@@ -1,24 +1,8 @@
 kind: wasmer.io/App.v0
-name: nexussai
 owner: nexuss0781
-package: '.'
+name: nexussai
+package: .
 app_id: da_KwGIWtMUpWzX
-annotations:
-  anybuild.run/config:
-    commands:
-      start: node src/server.js
-    edgejs_enable: true
-    edgejs_precompile: true
-    name: out
-    node_install_inputs:
-      - package.json
-    node_package_manager: npm
-    node_package_name: nexuss-ai
-    node_remove_native_binaries: true
-    node_server: express
-  anybuild.run/provider: node
-  anybuild.run/version: 0.28.4
-  wasmer.io/version: 7.4.1
 env:
   FILESYSTEM_KIT_URL: https://filesystem-kit.wasmer.app
   STATIC_DIR: /public
