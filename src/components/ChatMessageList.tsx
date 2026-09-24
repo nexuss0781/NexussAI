@@ -87,17 +87,17 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                   <div className="flex flex-wrap gap-1.5 justify-end">
                     {msg.attachments.map((file, i) => (
                       <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800 text-xs text-zinc-300 border border-zinc-700">
-                        <FileText className="w-3 h-3 text-purple-400" />
+                        <FileText className="w-3 h-3 text-violet-400" />
                         <span className="truncate max-w-[120px]">{file.name}</span>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="rounded-2xl rounded-tr-sm bg-purple-900/40 border border-purple-700/40 px-4 py-2.5 text-zinc-100 text-sm sm:text-base leading-relaxed shadow-sm">
+                <div className="rounded-2xl rounded-tr-sm bg-[#1c1929] border border-violet-500/30 px-4 py-2.5 text-zinc-100 text-sm sm:text-base leading-relaxed shadow-sm">
                   {msg.content}
                 </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-700 to-indigo-600 flex items-center justify-center text-xs font-semibold text-white shrink-0 mt-0.5 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-xs font-semibold text-white shrink-0 mt-0.5 shadow-sm">
                 ES
               </div>
             </div>
@@ -116,7 +116,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-zinc-200">Nexuss AI</span>
                 {msg.isDeepResearch && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-300">
                     <Sparkles className="w-2.5 h-2.5" /> Deeper Research
                   </span>
                 )}
@@ -128,7 +128,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               </div>
 
               {/* Message Content */}
-              <div className="rounded-2xl rounded-tl-sm bg-zinc-900/50 border border-zinc-800/80 p-4 sm:p-5 text-zinc-200 shadow-sm backdrop-blur-xs">
+              <div className="rounded-2xl rounded-tl-sm bg-[#131317] border border-zinc-800/80 p-4 sm:p-5 text-zinc-200 shadow-sm backdrop-blur-xs">
                 <MarkdownRenderer content={msg.content} />
               </div>
 
@@ -145,7 +145,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                 <button
                   onClick={() => handleSpeak(msg.id, msg.content)}
                   className={`p-1.5 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 text-xs transition-colors cursor-pointer ${
-                    isSpeaking ? 'text-purple-400 bg-purple-500/10' : ''
+                    isSpeaking ? 'text-violet-400 bg-violet-500/10' : ''
                   }`}
                   title={isSpeaking ? 'Stop speaking' : 'Read aloud'}
                 >
@@ -165,7 +165,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                 <button
                   onClick={() => handleFeedback(msg.id, 'up')}
                   className={`p-1.5 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 text-xs transition-colors cursor-pointer ${
-                    userFeedback === 'up' ? 'text-purple-400 bg-purple-500/10' : ''
+                    userFeedback === 'up' ? 'text-violet-400 bg-violet-500/10' : ''
                   }`}
                   title="Helpful response"
                 >
@@ -194,14 +194,14 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             <NexussFace size="sm" isThinking={true} />
           </div>
           <div className="space-y-2">
-            <div className="text-xs font-semibold text-purple-300 flex items-center gap-2">
+            <div className="text-xs font-semibold text-violet-300 flex items-center gap-2">
               <span>Nexuss AI is synthesizing response...</span>
             </div>
-            <div className="p-4 rounded-2xl rounded-tl-sm bg-zinc-900/40 border border-zinc-800/80 flex items-center gap-3">
+            <div className="p-4 rounded-2xl rounded-tl-sm bg-[#131317] border border-zinc-800/80 flex items-center gap-3">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce [animation-delay:-0.3s]" />
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce [animation-delay:-0.15s]" />
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-bounce" />
+                <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:-0.3s]" />
+                <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:-0.15s]" />
+                <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" />
               </div>
               <span className="text-xs text-zinc-400 font-mono">analyzing context & structure</span>
             </div>

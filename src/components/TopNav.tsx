@@ -88,17 +88,13 @@ export const TopNav: React.FC<TopNavProps> = ({
   }, []);
 
   return (
-    <header className={`h-14 border-b px-3 sm:px-6 flex items-center justify-between select-none z-30 shrink-0 transition-all duration-300 backdrop-blur-md ${
-      isDarkMode 
-        ? 'bg-black/85 border-zinc-900/80 shadow-[0_4px_20px_rgba(0,0,0,0.6)]' 
-        : 'bg-[#050409]/95 border-zinc-900/80 shadow-[0_4px_20px_rgba(0,0,0,0.6)]'
-    }`}>
+    <header className="h-14 border-b border-zinc-800/80 px-3 sm:px-6 flex items-center justify-between select-none z-30 shrink-0 transition-all duration-300 backdrop-blur-md bg-[#0c0c0e]/95 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
       {/* LEFT: Mobile Sidebar Trigger + Model Selector Dropdown */}
       <div className="flex items-center gap-2">
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="md:hidden group relative w-9 h-9 rounded-xl bg-purple-600/10 hover:bg-purple-600/25 border border-purple-500/20 hover:border-purple-400/40 flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0"
+            className="md:hidden group relative w-9 h-9 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/30 flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0"
             title="Open chats & history"
           >
             {/* Normal: Nexuss Face Logo */}
@@ -106,7 +102,7 @@ export const TopNav: React.FC<TopNavProps> = ({
               <NexussFace size="xs" animated={false} />
             </div>
             {/* Hover: Window / Expand Icon */}
-            <div className="absolute inset-0 flex items-center justify-center transition-all duration-200 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 text-purple-300">
+            <div className="absolute inset-0 flex items-center justify-center transition-all duration-200 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 text-violet-300">
               <PanelLeftOpen className="w-4 h-4" />
             </div>
           </button>
@@ -124,7 +120,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           </button>
 
           {modelDropdownOpen && (
-            <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl bg-[#14121f] border border-zinc-800 shadow-2xl p-1.5 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
+            <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl bg-[#141418] border border-zinc-800 shadow-2xl p-1.5 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
               <div className="px-3 py-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
                 Select Intelligence Model
               </div>
@@ -139,17 +135,17 @@ export const TopNav: React.FC<TopNavProps> = ({
                       setModelDropdownOpen(false);
                     }}
                     className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-colors cursor-pointer ${
-                      isSelected ? 'bg-purple-950/60 border border-purple-800/60' : 'hover:bg-zinc-800/50'
+                      isSelected ? 'bg-zinc-800/90 border border-violet-500/40' : 'hover:bg-zinc-800/50'
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg mt-0.5 ${isSelected ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+                    <div className={`p-1.5 rounded-lg mt-0.5 ${isSelected ? 'bg-violet-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-xs text-zinc-200">{m.label}</span>
                         <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                          isSelected ? 'bg-purple-500/20 text-purple-300' : 'bg-zinc-800 text-zinc-400'
+                          isSelected ? 'bg-violet-500/20 text-violet-300' : 'bg-zinc-800 text-zinc-400'
                         }`}>
                           {m.badge}
                         </span>
@@ -175,7 +171,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         </button>
 
         {moreMenuOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#14121f] border border-zinc-800 shadow-2xl p-1.5 z-50 text-xs animate-in fade-in zoom-in-95 duration-100">
+          <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#141418] border border-zinc-800 shadow-2xl p-1.5 z-50 text-xs animate-in fade-in zoom-in-95 duration-100">
             {/* Actions Group */}
             <div className="px-2.5 py-1 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
               Actions
@@ -208,9 +204,9 @@ export const TopNav: React.FC<TopNavProps> = ({
                 onUpgrade();
                 setMoreMenuOpen(false);
               }}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-purple-300 hover:bg-purple-950/40 hover:text-purple-200 transition-colors cursor-pointer text-left"
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-violet-300 hover:bg-zinc-800 hover:text-violet-200 transition-colors cursor-pointer text-left"
             >
-              <Zap className="w-3.5 h-3.5 text-purple-400" />
+              <Zap className="w-3.5 h-3.5 text-violet-400" />
               <span>Upgrade to Pro</span>
             </button>
 
@@ -224,7 +220,7 @@ export const TopNav: React.FC<TopNavProps> = ({
               }}
               className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-zinc-300 hover:bg-zinc-800/60 hover:text-white transition-colors cursor-pointer text-left"
             >
-              {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-purple-400" />}
+              {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-violet-400" />}
               <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
 
@@ -237,11 +233,11 @@ export const TopNav: React.FC<TopNavProps> = ({
               className="w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-zinc-300 hover:bg-zinc-800/60 hover:text-white transition-colors cursor-pointer text-left"
             >
               <span className="flex items-center gap-2.5">
-                <span className="w-3.5 h-3.5 rounded-md bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-[8px] font-bold text-purple-300">H</span>
+                <span className="w-3.5 h-3.5 rounded-md bg-violet-600/20 border border-violet-500/40 flex items-center justify-center text-[8px] font-bold text-violet-300">H</span>
                 <span>HUD Border Frame</span>
               </span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold transition-all duration-300 ${
-                showDecorations ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]' : 'bg-zinc-800 text-zinc-500'
+                showDecorations ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30' : 'bg-zinc-800 text-zinc-500'
               }`}>
                 {showDecorations ? 'ON' : 'OFF'}
               </span>

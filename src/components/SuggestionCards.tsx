@@ -43,9 +43,9 @@ export const SuggestionCards: React.FC<SuggestionCardsProps> = ({ onSelectSugges
             <button
               key={card.id}
               onClick={() => onSelectSuggestion(card.prompt, card.deepResearch)}
-              className="group flex flex-col items-start p-2 sm:p-2.5 md:p-3 rounded-xl sm:rounded-2xl bg-[#12101e]/60 hover:bg-[#181427]/80 border border-white/[0.07] hover:border-purple-400/40 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-purple-950/20 backdrop-blur-md cursor-pointer active:scale-[0.98] shrink-0 w-[170px] sm:w-[200px] md:w-auto snap-start"
+              className="group flex flex-col items-start p-2 sm:p-2.5 md:p-3 rounded-xl sm:rounded-2xl bg-[#141418] hover:bg-[#18181f] border border-zinc-800/80 hover:border-violet-400/30 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/50 backdrop-blur-md cursor-pointer active:scale-[0.98] shrink-0 w-[170px] sm:w-[200px] md:w-auto snap-start"
             >
-              <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 md:w-7 md:h-7 rounded-lg sm:rounded-xl bg-purple-950/40 border border-purple-800/30 group-hover:border-purple-500/50 group-hover:bg-purple-900/40 text-purple-300 flex items-center justify-center mb-1 sm:mb-1.5 md:mb-2 transition-all shrink-0">
+              <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 md:w-7 md:h-7 rounded-lg sm:rounded-xl bg-zinc-900 border border-zinc-800 group-hover:border-violet-500/40 group-hover:bg-violet-950/20 text-violet-300 flex items-center justify-center mb-1 sm:mb-1.5 md:mb-2 transition-all shrink-0">
                 <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </div>
               <div className="w-full min-w-0">

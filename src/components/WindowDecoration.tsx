@@ -1,12 +1,12 @@
 import React from 'react';
 
 export const WindowDecoration: React.FC = () => {
-  // Deep, vibrant futuristic violet/purple palette matching Nexuss design exactly
+  // Soft, calming lavender and violet palette with reduced glow for zero eye strain
   const colors = {
-    primary: '#a855f7',      // Bright futuristic violet
-    secondary: '#d8b4fe',    // Soft glowing light lavender/purple
-    glow: 'rgba(168, 85, 247, 0.4)',
-    accentBg: '#1e1136'      // Deep tech-purple background accent
+    primary: '#8b5cf6',      // Calibrated soft violet
+    secondary: '#c4b5fd',    // Muted calming lavender
+    glow: 'rgba(139, 92, 246, 0.15)',
+    accentBg: '#13111c'      // Discreet neutral-purple tone
   };
 
   return (
@@ -18,7 +18,7 @@ export const WindowDecoration: React.FC = () => {
       <div className="absolute top-0 left-0 w-44 sm:w-80 h-10 sm:h-16 transition-all duration-300">
         <svg
           viewBox="0 0 320 64"
-          className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.45)]"
+          className="w-full h-full drop-shadow-[0_0_6px_rgba(139,92,246,0.2)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -26,13 +26,13 @@ export const WindowDecoration: React.FC = () => {
           <path
             d="M 8 16 L 45 16 L 60 30 L 165 30 L 180 16 L 245 16"
             stroke={colors.primary}
-            strokeWidth="2"
+            strokeWidth="1.5"
             strokeLinecap="round"
-            opacity="0.95"
+            opacity="0.6"
           />
           
           {/* Slanted stripe vent cluster (//////) */}
-          <g stroke={colors.secondary} strokeWidth="2.5" opacity="0.9">
+          <g stroke={colors.secondary} strokeWidth="2" opacity="0.5">
             <line x1="75" y1="21" x2="80" y2="26" strokeLinecap="round" />
             <line x1="83" y1="21" x2="88" y2="26" strokeLinecap="round" />
             <line x1="91" y1="21" x2="96" y2="26" strokeLinecap="round" />
@@ -48,19 +48,18 @@ export const WindowDecoration: React.FC = () => {
             d="M 8 8 L 260 8 L 275 22 L 305 22"
             stroke={colors.primary}
             strokeWidth="1"
-            opacity="0.6"
+            opacity="0.35"
           />
-          <circle cx="305" cy="22" r="2.5" fill={colors.secondary} />
+          <circle cx="305" cy="22" r="2" fill={colors.secondary} opacity="0.6" />
 
-          {/* Glowing dot panel indicator */}
-          <circle cx="28" cy="16" r="2" fill="#ffffff" className="animate-ping" style={{ animationDuration: '3s' }} />
-          <circle cx="28" cy="16" r="2" fill={colors.secondary} />
+          {/* Calmed dot panel indicator */}
+          <circle cx="28" cy="16" r="1.5" fill={colors.secondary} opacity="0.8" />
           
           {/* Futuristic geometric notch */}
           <polygon
             points="145,21 160,21 155,26 140,26"
             fill={colors.primary}
-            opacity="0.4"
+            opacity="0.25"
           />
         </svg>
       </div>
@@ -71,7 +70,7 @@ export const WindowDecoration: React.FC = () => {
       <div className="absolute top-0 right-0 w-44 sm:w-80 h-10 sm:h-16 scale-x-[-1] transition-all duration-300">
         <svg
           viewBox="0 0 320 64"
-          className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.45)]"
+          className="w-full h-full drop-shadow-[0_0_6px_rgba(139,92,246,0.2)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -79,13 +78,13 @@ export const WindowDecoration: React.FC = () => {
           <path
             d="M 8 16 L 45 16 L 60 30 L 165 30 L 180 16 L 245 16"
             stroke={colors.primary}
-            strokeWidth="2"
+            strokeWidth="1.5"
             strokeLinecap="round"
-            opacity="0.95"
+            opacity="0.6"
           />
           
           {/* Vents */}
-          <g stroke={colors.secondary} strokeWidth="2.5" opacity="0.9">
+          <g stroke={colors.secondary} strokeWidth="2" opacity="0.5">
             <line x1="75" y1="21" x2="80" y2="26" strokeLinecap="round" />
             <line x1="83" y1="21" x2="88" y2="26" strokeLinecap="round" />
             <line x1="91" y1="21" x2="96" y2="26" strokeLinecap="round" />
@@ -100,28 +99,27 @@ export const WindowDecoration: React.FC = () => {
             d="M 8 8 L 260 8 L 275 22 L 305 22"
             stroke={colors.primary}
             strokeWidth="1"
-            opacity="0.6"
+            opacity="0.35"
           />
-          <circle cx="305" cy="22" r="2.5" fill={colors.secondary} />
+          <circle cx="305" cy="22" r="2" fill={colors.secondary} opacity="0.6" />
 
-          <circle cx="28" cy="16" r="2" fill="#ffffff" className="animate-ping" style={{ animationDuration: '4s' }} />
-          <circle cx="28" cy="16" r="2" fill={colors.secondary} />
+          <circle cx="28" cy="16" r="1.5" fill={colors.secondary} opacity="0.8" />
           
           <polygon
             points="145,21 160,21 155,26 140,26"
             fill={colors.primary}
-            opacity="0.4"
+            opacity="0.25"
           />
         </svg>
       </div>
 
       {/* ==========================================
-          3. RIGHT VERTICAL EDGE ORNAMENT (Inspired by Canva rightmost element)
+          3. RIGHT VERTICAL EDGE ORNAMENT
          ========================================== */}
       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-96 hidden md:block transition-all duration-300">
         <svg
           viewBox="0 0 32 384"
-          className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.35)]"
+          className="w-full h-full drop-shadow-[0_0_6px_rgba(139,92,246,0.15)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -130,11 +128,11 @@ export const WindowDecoration: React.FC = () => {
             d="M 8 10 L 8 135 L 18 145 L 18 245 L 8 255 L 8 370"
             stroke={colors.primary}
             strokeWidth="1"
-            opacity="0.5"
+            opacity="0.35"
           />
 
           {/* Slanted hash-vent cluster at the top */}
-          <g stroke={colors.primary} strokeWidth="2" opacity="0.9">
+          <g stroke={colors.primary} strokeWidth="1.5" opacity="0.5">
             <line x1="14" y1="20" x2="22" y2="12" />
             <line x1="14" y1="28" x2="22" y2="20" />
             <line x1="14" y1="36" x2="22" y2="28" />
@@ -147,15 +145,15 @@ export const WindowDecoration: React.FC = () => {
           <polygon
             points="10,147 22,147 22,243 10,243"
             fill={colors.primary}
-            opacity="0.8"
+            opacity="0.45"
           />
           {/* Hollow inner cut out */}
           <polygon
             points="12,152 20,152 20,238 12,238"
-            fill="#000000"
+            fill="#0c0c0e"
           />
 
-          {/* Subtle neon glowing accent inside the center bar */}
+          {/* Subtle glowing accent inside the center bar */}
           <rect
             x="14"
             y="160"
@@ -163,13 +161,12 @@ export const WindowDecoration: React.FC = () => {
             height="70"
             rx="1"
             fill={colors.secondary}
-            className="animate-pulse"
-            style={{ animationDuration: '2.5s' }}
+            opacity="0.6"
           />
 
-          {/* Lower vertical trace and terminal node with glowing effect */}
-          <line x1="18" y1="250" x2="18" y2="360" stroke={colors.primary} strokeWidth="1" opacity="0.6" />
-          <circle cx="18" cy="360" r="3" fill={colors.secondary} className="animate-pulse" />
+          {/* Lower vertical trace and terminal node with soft effect */}
+          <line x1="18" y1="250" x2="18" y2="360" stroke={colors.primary} strokeWidth="1" opacity="0.35" />
+          <circle cx="18" cy="360" r="2" fill={colors.secondary} opacity="0.6" />
         </svg>
       </div>
 
@@ -179,7 +176,7 @@ export const WindowDecoration: React.FC = () => {
       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-96 hidden md:block scale-x-[-1] transition-all duration-300">
         <svg
           viewBox="0 0 32 384"
-          className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.35)]"
+          className="w-full h-full drop-shadow-[0_0_6px_rgba(139,92,246,0.15)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -187,10 +184,10 @@ export const WindowDecoration: React.FC = () => {
             d="M 8 10 L 8 135 L 18 145 L 18 245 L 8 255 L 8 370"
             stroke={colors.primary}
             strokeWidth="1"
-            opacity="0.5"
+            opacity="0.35"
           />
 
-          <g stroke={colors.primary} strokeWidth="2" opacity="0.9">
+          <g stroke={colors.primary} strokeWidth="1.5" opacity="0.5">
             <line x1="14" y1="20" x2="22" y2="12" />
             <line x1="14" y1="28" x2="22" y2="20" />
             <line x1="14" y1="36" x2="22" y2="28" />
@@ -202,11 +199,11 @@ export const WindowDecoration: React.FC = () => {
           <polygon
             points="10,147 22,147 22,243 10,243"
             fill={colors.primary}
-            opacity="0.8"
+            opacity="0.45"
           />
           <polygon
             points="12,152 20,152 20,238 12,238"
-            fill="#000000"
+            fill="#0c0c0e"
           />
 
           <rect
@@ -216,22 +213,21 @@ export const WindowDecoration: React.FC = () => {
             height="70"
             rx="1"
             fill={colors.secondary}
-            className="animate-pulse"
-            style={{ animationDuration: '3s' }}
+            opacity="0.6"
           />
 
-          <line x1="18" y1="250" x2="18" y2="360" stroke={colors.primary} strokeWidth="1" opacity="0.6" />
-          <circle cx="18" cy="360" r="3" fill={colors.secondary} className="animate-pulse" />
+          <line x1="18" y1="250" x2="18" y2="360" stroke={colors.primary} strokeWidth="1" opacity="0.35" />
+          <circle cx="18" cy="360" r="2" fill={colors.secondary} opacity="0.6" />
         </svg>
       </div>
 
       {/* ==========================================
-          5. BOTTOM EDGE STATUS RAIL (Futuristic tracking bar with circle metrics)
+          5. BOTTOM EDGE STATUS RAIL
          ========================================== */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-10 sm:h-12 transition-all duration-300">
         <svg
           viewBox="0 0 384 48"
-          className="w-full h-full drop-shadow-[0_0_12px_rgba(168,85,247,0.35)]"
+          className="w-full h-full drop-shadow-[0_0_6px_rgba(139,92,246,0.15)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -239,32 +235,32 @@ export const WindowDecoration: React.FC = () => {
           <path
             d="M 12 32 L 130 32 L 140 20 L 244 20 L 254 32 L 372 32"
             stroke={colors.primary}
-            strokeWidth="1.5"
-            opacity="0.85"
+            strokeWidth="1.2"
+            opacity="0.5"
           />
           <path
             d="M 24 40 L 126 40 L 134 28 L 250 28 L 258 40 L 360 40"
             stroke={colors.secondary}
             strokeWidth="1"
-            opacity="0.5"
+            opacity="0.3"
           />
 
           {/* 8-dot Status Node Circle Group (○○○○○○○○) */}
-          <g stroke={colors.primary} strokeWidth="1.2" fill="none" opacity="0.9">
-            <circle cx="140" cy="28" r="3" />
-            <circle cx="152" cy="28" r="3" />
-            <circle cx="164" cy="28" r="3" />
-            <circle cx="176" cy="28" r="3" />
-            <circle cx="188" cy="28" r="3" fill={colors.secondary} className="animate-pulse" /> {/* Glowing active node */}
-            <circle cx="200" cy="28" r="3" />
-            <circle cx="212" cy="28" r="3" />
-            <circle cx="224" cy="28" r="3" />
-            <circle cx="236" cy="28" r="3" />
-            <circle cx="248" cy="28" r="3" />
+          <g stroke={colors.primary} strokeWidth="1" fill="none" opacity="0.6">
+            <circle cx="140" cy="28" r="2.5" />
+            <circle cx="152" cy="28" r="2.5" />
+            <circle cx="164" cy="28" r="2.5" />
+            <circle cx="176" cy="28" r="2.5" />
+            <circle cx="188" cy="28" r="2.5" fill={colors.secondary} opacity="0.8" />
+            <circle cx="200" cy="28" r="2.5" />
+            <circle cx="212" cy="28" r="2.5" />
+            <circle cx="224" cy="28" r="2.5" />
+            <circle cx="236" cy="28" r="2.5" />
+            <circle cx="248" cy="28" r="2.5" />
           </g>
 
           {/* Slanted lines clusters at bottom ends */}
-          <g stroke={colors.secondary} strokeWidth="2" opacity="0.8">
+          <g stroke={colors.secondary} strokeWidth="1.5" opacity="0.45">
             {/* Left group */}
             <line x1="45" y1="35" x2="50" y2="38" />
             <line x1="53" y1="35" x2="58" y2="38" />

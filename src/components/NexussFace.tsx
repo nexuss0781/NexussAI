@@ -52,14 +52,14 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
       className={`relative inline-flex items-center justify-center shrink-0 select-none aspect-square ${sizeClasses} ${className} transition-transform duration-300 active:scale-95`}
       style={inlineStyle}
     >
-      {/* Ambient ethereal violet aura glow: fully responsive on mobile and desktop */}
+      {/* Ambient ethereal violet aura glow: soft, non-fatiguing, cut by half */}
       <div 
         className={`absolute inset-0 rounded-[28%] pointer-events-none transition-all duration-700 ${
           isThinking 
-            ? 'bg-purple-500/35 blur-lg sm:blur-xl scale-125 animate-pulse' 
+            ? 'bg-violet-500/20 blur-md sm:blur-lg scale-115 animate-pulse' 
             : isBig 
-              ? 'bg-purple-600/20 blur-md sm:blur-xl scale-110' 
-              : 'bg-purple-500/15 blur-xs scale-100'
+              ? 'bg-violet-500/10 blur-sm sm:blur-md scale-105' 
+              : 'bg-violet-500/6 blur-xs scale-100'
         }`}
       />
 
@@ -78,8 +78,8 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
             ? 'radial-gradient(120% 120% at 30% 20%, #E8E5DD 0%, #DCD9D0 55%, #D0CDBF 100%)'
             : '#E8E5DD',
           boxShadow: isBig
-            ? 'inset 0 1.5px 2px rgba(255, 255, 255, 1), inset 0 -2px 6px rgba(0, 0, 0, 0.05), 0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 0 20px -2px rgba(168, 85, 247, 0.1)'
-            : 'inset 0 1px 1.5px rgba(255, 255, 255, 1), inset 0 -1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05)',
+            ? 'inset 0 1.5px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 6px rgba(0, 0, 0, 0.05), 0 6px 18px -4px rgba(0, 0, 0, 0.25), 0 0 10px -2px rgba(139, 92, 246, 0.06)'
+            : 'inset 0 1px 1.5px rgba(255, 255, 255, 0.9), inset 0 -1px 3px rgba(0, 0, 0, 0.05), 0 3px 8px rgba(0, 0, 0, 0.2)',
           border: isBig 
             ? '1.25px solid rgba(200, 200, 200, 0.3)' 
             : '1.25px solid rgba(200, 200, 200, 0.5)',

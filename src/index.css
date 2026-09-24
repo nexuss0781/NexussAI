@@ -17,11 +17,11 @@
 @keyframes orb-float {
   0%, 100% {
     transform: translateY(0px) scale(1);
-    filter: drop-shadow(0 0 35px rgba(168, 85, 247, 0.45));
+    filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.2));
   }
   50% {
     transform: translateY(-8px) scale(1.02);
-    filter: drop-shadow(0 0 50px rgba(192, 132, 252, 0.6));
+    filter: drop-shadow(0 0 24px rgba(167, 139, 250, 0.28));
   }
 }
 

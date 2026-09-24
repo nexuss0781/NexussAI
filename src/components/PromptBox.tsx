@@ -139,8 +139,8 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto px-1 sm:px-4">
-      {/* Outer Card with subtle glass glow */}
-      <div className="relative rounded-xl sm:rounded-[22px] bg-zinc-900/80 border border-zinc-800/80 shadow-xl shadow-purple-950/10 backdrop-blur-md transition-all focus-within:border-purple-500/40 focus-within:ring-1 focus-within:ring-purple-500/30">
+      {/* Outer Card with neutral near-black and soft violet focus state */}
+      <div className="relative rounded-xl sm:rounded-[22px] bg-[#141418] border border-zinc-800 shadow-xl shadow-black/40 backdrop-blur-md transition-all focus-within:border-violet-500/40 focus-within:ring-1 focus-within:ring-violet-500/20">
         
         {/* Attachment chips */}
         {attachments.length > 0 && (
@@ -150,7 +150,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
                 key={idx}
                 className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-zinc-800 border border-zinc-700 text-[11px] sm:text-xs text-zinc-300"
               >
-                <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-400 shrink-0" />
+                <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-violet-400 shrink-0" />
                 <span className="max-w-[90px] sm:max-w-[140px] truncate">{file.name}</span>
                 <span className="text-[9px] sm:text-[10px] text-zinc-500">({file.size})</span>
                 <button
@@ -189,11 +189,11 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
               onClick={() => setDeepResearch(!deepResearch)}
               className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 ${
                 deepResearch
-                  ? 'bg-purple-600/25 border border-purple-500/60 text-purple-200 shadow-xs shadow-purple-500/20'
+                  ? 'bg-violet-600/20 border border-violet-500/40 text-violet-200 shadow-xs'
                   : 'bg-zinc-800/50 border border-zinc-700/60 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600'
               }`}
             >
-              <Sparkles className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${deepResearch ? 'text-purple-300' : 'text-zinc-400'}`} />
+              <Sparkles className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${deepResearch ? 'text-violet-300' : 'text-zinc-400'}`} />
               <span className="whitespace-nowrap">Deep Research</span>
             </button>
 
@@ -241,7 +241,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
                 type="button"
                 onClick={() => handleSubmit()}
                 disabled={isLoading}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white flex items-center justify-center shadow-md shadow-purple-600/30 transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center shadow-md shadow-violet-900/30 transition-all cursor-pointer transform hover:scale-105 active:scale-95"
                 title="Send message (Enter)"
               >
                 <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
@@ -253,7 +253,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                   isListening
                     ? 'bg-rose-500 text-white animate-pulse'
-                    : 'bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 hover:text-purple-200 border border-purple-500/30'
+                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-750 hover:text-zinc-200 border border-zinc-700/60 hover:border-violet-500/30'
                 }`}
                 title={isListening ? 'Stop voice input' : 'Voice input'}
               >
@@ -269,9 +269,9 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
         <button
           type="button"
           onClick={onOpenSavedPrompts}
-          className="flex items-center gap-1 sm:gap-1.5 hover:text-purple-300 transition-colors cursor-pointer py-0.5"
+          className="flex items-center gap-1 sm:gap-1.5 hover:text-violet-300 transition-colors cursor-pointer py-0.5"
         >
-          <Bookmark className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-400" />
+          <Bookmark className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-violet-400" />
           <span>Saved prompts</span>
         </button>
 

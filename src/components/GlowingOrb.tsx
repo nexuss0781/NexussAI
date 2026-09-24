@@ -17,14 +17,14 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
     return (
       <div className={`relative inline-flex items-center justify-center shrink-0 select-none ${className}`}>
         {/* Soft micro glow */}
-        <div className="absolute w-6 h-6 rounded-full bg-purple-500/30 blur-[4px] pointer-events-none" />
+        <div className="absolute w-6 h-6 rounded-full bg-violet-500/15 blur-[3px] pointer-events-none" />
         
         {/* Micro 3D Moon Orb */}
         <div
           className={`relative w-5 h-5 rounded-full ${animate ? 'animate-orb-float' : ''}`}
           style={{
-            background: 'radial-gradient(circle at 35% 30%, #f3e8ff 0%, #c084fc 30%, #9333ea 65%, #581c87 95%)',
-            boxShadow: 'inset -1.5px -1.5px 4px rgba(45, 10, 80, 0.8), inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.9), 0 0 8px rgba(168, 85, 247, 0.5)',
+            background: 'radial-gradient(circle at 35% 30%, #f5f3ff 0%, #ddd6fe 30%, #8b5cf6 65%, #4c1d95 95%)',
+            boxShadow: 'inset -1.5px -1.5px 4px rgba(35, 10, 60, 0.6), inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.9), 0 0 5px rgba(139, 92, 246, 0.25)',
           }}
         >
           {/* Top highlight */}
@@ -41,14 +41,14 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
     return (
       <div className={`relative inline-flex items-center justify-center shrink-0 select-none ${className}`}>
         {/* Ambient glow */}
-        <div className="absolute w-9 h-9 rounded-full bg-purple-500/35 blur-[6px] pointer-events-none" />
+        <div className="absolute w-8 h-8 rounded-full bg-violet-500/20 blur-[5px] pointer-events-none" />
         
         {/* 3D Moon Orb */}
         <div
           className={`relative w-7 h-7 sm:w-8 sm:h-8 rounded-full ${animate ? 'animate-orb-float' : ''}`}
           style={{
-            background: 'radial-gradient(circle at 35% 30%, #f3e8ff 0%, #c084fc 25%, #9333ea 60%, #581c87 90%)',
-            boxShadow: 'inset -2.5px -2.5px 7px rgba(45, 10, 80, 0.8), inset 2px 2px 5px rgba(255, 255, 255, 0.85), 0 0 12px rgba(168, 85, 247, 0.5)',
+            background: 'radial-gradient(circle at 35% 30%, #f5f3ff 0%, #ddd6fe 25%, #8b5cf6 60%, #4c1d95 90%)',
+            boxShadow: 'inset -2px -2px 6px rgba(35, 10, 60, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.85), 0 0 7px rgba(139, 92, 246, 0.25)',
           }}
         >
           {/* Specular sheen */}
@@ -74,24 +74,24 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       <div 
         className={`absolute rounded-full transition-all duration-700 ${
           isThinking 
-            ? 'w-44 h-44 bg-purple-500/40 blur-2xl scale-125 animate-pulse' 
-            : 'w-36 h-36 bg-purple-600/25 blur-2xl animate-pulse-subtle'
+            ? 'w-44 h-44 bg-violet-500/20 blur-xl scale-115 animate-pulse' 
+            : 'w-36 h-36 bg-violet-500/12 blur-xl animate-pulse-subtle'
         }`}
       />
 
       {/* Secondary soft lavender backlight */}
-      <div className="absolute w-28 h-28 rounded-full bg-violet-400/20 blur-xl" />
+      <div className="absolute w-28 h-28 rounded-full bg-violet-400/10 blur-lg" />
 
       {/* Main 3D Glass Iridescent Moon Sphere */}
       <div
         className={`relative ${sizeClasses} rounded-full ${animate ? 'animate-orb-float' : ''} transition-transform duration-500`}
         style={{
-          background: 'radial-gradient(circle at 35% 30%, #f3e8ff 0%, #c084fc 25%, #9333ea 60%, #581c87 90%)',
+          background: 'radial-gradient(circle at 35% 30%, #f5f3ff 0%, #ddd6fe 25%, #8b5cf6 60%, #4c1d95 90%)',
           boxShadow: `
-            inset -8px -8px 24px rgba(45, 10, 80, 0.75),
-            inset 6px 6px 14px rgba(255, 255, 255, 0.8),
-            0 12px 36px -6px rgba(147, 51, 234, 0.45),
-            0 0 50px rgba(192, 132, 252, 0.4)
+            inset -6px -6px 18px rgba(35, 10, 60, 0.6),
+            inset 5px 5px 12px rgba(255, 255, 255, 0.8),
+            0 8px 24px -4px rgba(139, 92, 246, 0.25),
+            0 0 25px rgba(196, 181, 253, 0.2)
           `,
         }}
       >

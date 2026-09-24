@@ -272,12 +272,12 @@ export default function App() {
   };
 
   return (
-    <div className={`h-[100dvh] h-screen w-screen overflow-hidden relative flex items-center justify-center p-3 sm:p-5 lg:p-6 transition-colors duration-300 ${isDarkMode ? 'bg-[#020105] text-zinc-100' : 'bg-[#020105] text-zinc-100'}`}>
+    <div className={`h-[100dvh] h-screen w-screen overflow-hidden relative flex items-center justify-center p-3 sm:p-5 lg:p-6 transition-colors duration-300 ${isDarkMode ? 'bg-[#09090b] text-zinc-100' : 'bg-[#09090b] text-zinc-100'}`}>
       
-      {/* Background ethereal atmospheric glow */}
+      {/* Background ethereal atmospheric glow: cut by half with soft violet tone */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-1/4 left-1/3 w-[550px] h-[550px] bg-purple-600/10 rounded-full blur-[140px] animate-pulse-subtle" />
-        <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-indigo-600/80 rounded-full blur-[120px] opacity-[0.08]" />
+        <div className="absolute top-1/4 left-1/3 w-[420px] h-[420px] bg-violet-600/[0.04] rounded-full blur-[160px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-indigo-600/[0.03] rounded-full blur-[140px]" />
       </div>
 
       {/* Cybernetic Window Corner & Edge Decorations (Framing the viewport and container) */}
@@ -287,10 +287,10 @@ export default function App() {
         MAIN NON-SCROLLABLE APP CONTAINER:
         Strictly fits the viewport (h-full). The window itself NEVER scrolls.
       */}
-      <div className={`relative z-10 w-full h-full sm:max-w-[1600px] rounded-xl sm:rounded-2xl overflow-hidden flex flex-row border border-purple-500/25 transition-all duration-300 ${
+      <div className={`relative z-10 w-full h-full sm:max-w-[1600px] rounded-xl sm:rounded-2xl overflow-hidden flex flex-row border border-zinc-800/80 transition-all duration-300 ${
         isDarkMode 
-          ? 'bg-[#06040b]/98 shadow-[0_0_80px_rgba(0,0,0,0.9)]' 
-          : 'bg-[#090710]/98 shadow-[0_0_80px_rgba(0,0,0,0.85)]'
+          ? 'bg-[#0c0c0e] shadow-[0_20px_60px_rgba(0,0,0,0.85)]' 
+          : 'bg-[#101014] shadow-[0_20px_60px_rgba(0,0,0,0.7)]'
       }`}>
         
         {/* Left Sidebar (Histories directly under search) */}
@@ -308,11 +308,7 @@ export default function App() {
         />
 
         {/* Right Main Interface */}
-        <main className={`flex-1 flex flex-col h-full min-w-0 min-h-0 relative overflow-hidden transition-all duration-300 ${
-          isDarkMode 
-            ? 'bg-gradient-to-b from-[#000000] via-[#050409] to-[#0c0a18]' 
-            : 'bg-gradient-to-b from-[#000000] via-[#070510] to-[#120f22]'
-        }`}>
+        <main className="flex-1 flex flex-col h-full min-w-0 min-h-0 relative overflow-hidden transition-all duration-300 bg-[#0c0c0e]">
           
           {/* Top Bar Navigation */}
           <TopNav
@@ -343,13 +339,9 @@ export default function App() {
               // Empty State (Clean face avatar + Greeting + Prompts)
               <div className="flex-1 flex flex-col justify-between min-h-0 overflow-y-auto px-3 sm:px-6 md:px-8 py-3 sm:py-6 animate-in fade-in duration-300">
                 
-                {/* Polished Big Box with sleek blackish background and glowing border */}
+                {/* Polished Big Box with clean neutral near-black background */}
                 <div className="my-auto w-full max-w-3xl mx-auto px-1 sm:px-2">
-                  <div className={`w-full rounded-2xl sm:rounded-[28px] p-4 sm:p-7 md:p-9 border transition-all duration-300 ${
-                    isDarkMode 
-                      ? 'bg-black/75 border-zinc-800/90 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl' 
-                      : 'bg-[#0a0814] border-zinc-800 shadow-[0_20px_50px_rgba(10,8,20,0.4)]'
-                  }`}>
+                  <div className="w-full rounded-2xl sm:rounded-[28px] p-4 sm:p-7 md:p-9 border border-zinc-800/80 bg-[#121215]/95 shadow-[0_16px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-all duration-300">
                     
                     {/* Hero Centerpiece inside the Big Box */}
                     <div className="flex flex-col items-center justify-start text-center w-full">
@@ -360,9 +352,9 @@ export default function App() {
 
                       {/* Welcome & Dynamic Greeting Intro text (Polished luxury typography) */}
                       <div className="space-y-1 sm:space-y-1.5 max-w-xl mx-auto px-2 mb-3 sm:mb-4 md:mb-5">
-                        {/* Upper dynamic greeting with user chip */}
-                        <div className="inline-flex items-center justify-center gap-1 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-purple-950/40 border border-purple-500/20 backdrop-blur-sm shadow-xs text-xs sm:text-[13px] md:text-sm font-display text-purple-300/95 tracking-wide">
-                          <span>{timeGreeting},</span>
+                        {/* Upper dynamic greeting with user chip: calm neutral with soft violet accent */}
+                        <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 backdrop-blur-sm shadow-xs text-xs sm:text-[13px] md:text-sm font-display text-zinc-300 tracking-wide">
+                          <span className="text-zinc-400">{timeGreeting},</span>
                           {isEditingName ? (
                             <input
                               type="text"
@@ -371,12 +363,12 @@ export default function App() {
                               onBlur={() => setIsEditingName(false)}
                               onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
                               autoFocus
-                              className="bg-zinc-900 border border-purple-400/60 rounded-md px-2 py-0.5 text-purple-200 outline-none text-xs sm:text-sm w-20 sm:w-28 text-center"
+                              className="bg-zinc-800 border border-violet-400/50 rounded-md px-2 py-0.5 text-zinc-100 outline-none text-xs sm:text-sm w-20 sm:w-28 text-center"
                             />
                           ) : (
                             <span 
                               onClick={() => setIsEditingName(true)}
-                              className="cursor-pointer font-medium text-white hover:text-purple-200 transition-colors underline decoration-purple-400/50 underline-offset-4 decoration-1"
+                              className="cursor-pointer font-medium text-violet-300 hover:text-violet-200 transition-colors underline decoration-violet-400/40 underline-offset-4 decoration-1"
                               title="Click to edit name"
                             >
                               {userName}
@@ -384,9 +376,9 @@ export default function App() {
                           )}
                         </div>
 
-                        {/* Main Polished Hero Headline with dynamic serif & gradient accent */}
+                        {/* Main Polished Hero Headline with dynamic serif & soft lavender accent */}
                         <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[35px] font-serif-luxury tracking-normal text-zinc-100 leading-tight font-normal">
-                          How can I assist <span className="italic bg-gradient-to-r from-purple-200 via-purple-300 to-indigo-200 bg-clip-text text-transparent font-normal">your mind</span> today?
+                          How can I assist <span className="italic bg-gradient-to-r from-violet-200 via-purple-200 to-indigo-200 bg-clip-text text-transparent font-normal">your mind</span> today?
                         </h1>
                         
                         <p className="text-[11px] sm:text-xs text-zinc-400 font-display font-light tracking-wide max-w-md mx-auto hidden sm:block">
@@ -419,7 +411,7 @@ export default function App() {
                       href="https://discord.com" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-purple-400 hover:text-purple-300 underline font-medium"
+                      className="text-violet-400 hover:text-violet-300 underline font-medium"
                     >
                       Discord
                     </a>
@@ -469,7 +461,7 @@ export default function App() {
                 </div>
 
                 {/* Docked bottom prompt box - never jumps or scrolls with window */}
-                <div className="shrink-0 p-2 sm:p-3 sm:pb-4 sm:pt-2 bg-gradient-to-t from-[#0e0d16] via-[#0e0d16]/95 to-transparent border-t border-zinc-800/40">
+                <div className="shrink-0 p-2 sm:p-3 sm:pb-4 sm:pt-2 bg-gradient-to-t from-[#0c0c0e] via-[#0c0c0e]/95 to-transparent border-t border-zinc-800/50">
                   <PromptBox
                     onSendMessage={handleSendMessage}
                     isLoading={isLoading}
@@ -487,7 +479,7 @@ export default function App() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-purple-900/90 text-white text-xs font-medium border border-purple-500/40 shadow-xl backdrop-blur-md animate-in slide-in-from-bottom-3 duration-200 flex items-center gap-2">
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-zinc-900 text-white text-xs font-medium border border-zinc-700 shadow-xl backdrop-blur-md animate-in slide-in-from-bottom-3 duration-200 flex items-center gap-2">
           <Check className="w-3.5 h-3.5 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
