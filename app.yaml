@@ -10,7 +10,8 @@ annotations:
     edgejs_enable: true
     edgejs_precompile: true
     name: out
-    node_install_inputs: []
+    node_install_inputs:
+      - package.json
     node_package_manager: npm
     node_package_name: nexuss-ai
     node_remove_native_binaries: true
