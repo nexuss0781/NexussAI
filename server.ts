@@ -1,12 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -346,21 +342,25 @@ app.get('/api/health', (req, res) => {
 });
 
 // Vite Middleware for Dev vs Production Static Serving
-if (process.env.NODE_ENV !== 'production') {
-  const { createServer } = await import('vite');
-  const vite = await createServer({
-    server: { middlewareMode: true },
-    appType: 'spa',
-  });
-  app.use(vite.middlewares);
-} else {
-  const staticRoot = process.env.STATIC_DIR || path.resolve(__dirname, 'dist');
-  app.use(express.static(staticRoot));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(staticRoot, 'index.html'));
+async function startServer() {
+  if (process.env.NODE_ENV !== 'production') {
+    const { createServer } = await import('vite');
+    const vite = await createServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  } else {
+    const staticRoot = process.env.STATIC_DIR || path.resolve(process.cwd(), 'dist');
+    app.use(express.static(staticRoot));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(staticRoot, 'index.html'));
+    });
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Nexuss AI server is live at http://0.0.0.0:${PORT}`);
   });
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Nexuss AI server is live at http://0.0.0.0:${PORT}`);
-});
+startServer();
