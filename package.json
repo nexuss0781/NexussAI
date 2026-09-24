@@ -1,11 +1,11 @@
 {
   "name": "nexuss-ai",
-  "private": true,
+  "private": false,
   "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build",
+    "build:frontend": "vite build",
     "start": "node src/server.js",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
