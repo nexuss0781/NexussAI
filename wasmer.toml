@@ -1,0 +1,7 @@
+[package]
+name = 'nexuss0781/nexussai'
+version = '0.1.22'
+description = 'Nexuss AI autonomous agent with Filesystem Kit integration'
+
+[fs]
+'/public' = 'dist'
