@@ -1,6 +1,0 @@
-[package]
-name = 'nexuss0781/nexussai'
-version = '0.1.8'
-description = 'Nexuss AI - High performance AI assistant web application'
-[fs]
-'/public' = 'dist'
