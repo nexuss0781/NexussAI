@@ -49,10 +49,10 @@ export const SuggestionCards: React.FC<SuggestionCardsProps> = ({ onSelectSugges
                 <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </div>
               <div className="w-full min-w-0">
-                <div className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-200 group-hover:text-white transition-colors truncate">
+                <div className="text-[11.5px] sm:text-xs font-medium tracking-tight text-zinc-100 group-hover:text-white transition-colors truncate">
                   {card.title}
                 </div>
-                <div className="text-[9.5px] sm:text-[10.5px] md:text-[11px] text-zinc-400 mt-0.5 line-clamp-2 leading-relaxed font-light">
+                <div className="text-[10px] sm:text-[11px] md:text-[11.5px] text-zinc-300 mt-0.5 line-clamp-2 leading-relaxed font-normal">
                   {card.description}
                 </div>
               </div>

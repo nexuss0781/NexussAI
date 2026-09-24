@@ -97,7 +97,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                   {msg.content}
                 </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-xs font-semibold text-white shrink-0 mt-0.5 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-zinc-850 border border-zinc-700/80 flex items-center justify-center text-xs font-medium text-zinc-200 shrink-0 mt-0.5 shadow-xs">
                 ES
               </div>
             </div>

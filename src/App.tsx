@@ -353,8 +353,8 @@ export default function App() {
                       {/* Welcome & Dynamic Greeting Intro text (Polished luxury typography) */}
                       <div className="space-y-1 sm:space-y-1.5 max-w-xl mx-auto px-2 mb-3 sm:mb-4 md:mb-5">
                         {/* Upper dynamic greeting with user chip: calm neutral with soft violet accent */}
-                        <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 backdrop-blur-sm shadow-xs text-xs sm:text-[13px] md:text-sm font-display text-zinc-300 tracking-wide">
-                          <span className="text-zinc-400">{timeGreeting},</span>
+                        <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 backdrop-blur-sm shadow-xs text-xs sm:text-[13px] md:text-sm font-display text-zinc-200 tracking-wide">
+                          <span className="text-zinc-300">{timeGreeting},</span>
                           {isEditingName ? (
                             <input
                               type="text"
@@ -381,7 +381,7 @@ export default function App() {
                           How can I assist <span className="italic bg-gradient-to-r from-violet-200 via-purple-200 to-indigo-200 bg-clip-text text-transparent font-normal">your mind</span> today?
                         </h1>
                         
-                        <p className="text-[11px] sm:text-xs text-zinc-400 font-display font-light tracking-wide max-w-md mx-auto hidden sm:block">
+                        <p className="text-xs sm:text-[13px] text-zinc-300 font-display font-normal tracking-wide max-w-md mx-auto hidden sm:block">
                           Synthesis, deep research, code architecting & creative reasoning
                         </p>
                       </div>
@@ -404,7 +404,7 @@ export default function App() {
                 </div>
 
                 {/* Bottom Footer bar */}
-                <div className="pt-1 sm:pt-3 flex flex-col sm:flex-row items-center justify-between text-[10px] sm:text-[11px] text-zinc-500 gap-1 sm:gap-2 px-1 select-none shrink-0">
+                <div className="pt-1 sm:pt-3 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-zinc-400 gap-1 sm:gap-2 px-1 select-none shrink-0">
                   <div className="flex items-center gap-1">
                     <span>Join the Nexuss community for insights</span>
                     <a 
@@ -421,7 +421,7 @@ export default function App() {
                     {/* Language selector */}
                     <button
                       onClick={() => setLanguageOpen(!languageOpen)}
-                      className="flex items-center gap-1 hover:text-zinc-300 transition-colors cursor-pointer"
+                      className="flex items-center gap-1 hover:text-zinc-200 transition-colors cursor-pointer"
                       title="Select Language"
                     >
                       <Languages className="w-3.5 h-3.5" />
@@ -431,7 +431,7 @@ export default function App() {
                     {/* Help modal */}
                     <button
                       onClick={() => alert("Nexuss AI v3.8\n\n• Press Enter to send\n• Press Shift+Enter for new line\n• Toggle 'Deep Research' for structured multi-step synthesis")}
-                      className="hover:text-zinc-300 transition-colors p-1 cursor-pointer"
+                      className="hover:text-zinc-200 transition-colors p-1 cursor-pointer"
                       title="Help & Shortcuts"
                     >
                       <HelpCircle className="w-3.5 h-3.5" />

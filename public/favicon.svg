@@ -39,7 +39,7 @@
     <!-- Right Capsule Eye -->
     <rect x="58" y="27" width="10" height="21" rx="5" fill="url(#phosphor)" />
 
-    <!-- Smiling Confident Mouth -->
-    <path d="M 34 63.2 C 40 65.0, 60 65.0, 66 63.2" stroke="#201738" stroke-width="3.2" stroke-linecap="round" fill="none" opacity="0.98" />
+    <!-- Smiling Playful Confident Mouth -->
+    <path d="M 32 62 C 38 67.5, 62 67.5, 68 62" stroke="#201738" stroke-width="3.2" stroke-linecap="round" fill="none" opacity="0.98" />
   </g>
 </svg>

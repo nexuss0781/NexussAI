@@ -121,33 +121,19 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
             )}
 
             {/* 
-              CROSS-DEVICE BLINKING & WINKING:
+              CROSS-DEVICE NATURAL CALM BLINKING:
               Uses transform-box: fill-box and transform-origin: center center.
-              Guarantees zero distortion and rock-solid responsiveness on Desktop, Tablet, and Mobile Safari/Chrome!
+              Synchronous, natural human blink rhythm (every 5.8s, ~130ms duration)
+              eliminates peripheral eye fatigue and jitter.
             */}
             {animated && (
               <style>{`
-                @keyframes leftBlink_${cleanId} {
-                  0%, 35%, 41%, 86%, 92%, 100% {
+                @keyframes naturalBlink_${cleanId} {
+                  0%, 91%, 95.5%, 100% {
                     transform: scaleY(1);
                   }
-                  38% {
-                    transform: scaleY(0.1);
-                  }
-                  89% {
-                    transform: scaleY(0.1);
-                  }
-                }
-
-                @keyframes rightBlink_${cleanId} {
-                  0%, 36%, 42%, 69%, 76%, 100% {
-                    transform: scaleY(1);
-                  }
-                  39% {
-                    transform: scaleY(0.1);
-                  }
-                  72% {
-                    transform: scaleY(0.1);
+                  93.2% {
+                    transform: scaleY(0.08);
                   }
                 }
 
@@ -165,13 +151,13 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
                 .anim-l-eye_${cleanId} {
                   transform-box: fill-box;
                   transform-origin: center center;
-                  animation: ${isThinking ? `thinkingPulse_${cleanId} 1.4s ease-in-out infinite` : `leftBlink_${cleanId} 6.4s cubic-bezier(0.4, 0, 0.2, 1) infinite`};
+                  animation: ${isThinking ? `thinkingPulse_${cleanId} 1.4s ease-in-out infinite` : `naturalBlink_${cleanId} 5.8s cubic-bezier(0.45, 0, 0.55, 1) infinite`};
                 }
 
                 .anim-r-eye_${cleanId} {
                   transform-box: fill-box;
                   transform-origin: center center;
-                  animation: ${isThinking ? `thinkingPulse_${cleanId} 1.4s ease-in-out infinite 0.15s` : `rightBlink_${cleanId} 6.4s cubic-bezier(0.4, 0, 0.2, 1) infinite`};
+                  animation: ${isThinking ? `thinkingPulse_${cleanId} 1.4s ease-in-out infinite` : `naturalBlink_${cleanId} 5.8s cubic-bezier(0.45, 0, 0.55, 1) infinite`};
                 }
               `}</style>
             )}
@@ -216,7 +202,7 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
               )}
             </g>
 
-            {/* Right Capsule Eye (with distinct WINK) */}
+            {/* Right Capsule Eye */}
             <g className={animated ? `anim-r-eye_${cleanId}` : ''}>
               <rect
                 x="58"
@@ -233,15 +219,15 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
             </g>
 
             {/* 
-              2. FORMAL POISED MOUTH (QUIET CONFIDENCE):
-              - Lifted corners by 2-3 degrees (y=63.2 vs center y=65.0).
+              2. PLAYFUL & WARM SMILE:
+              - Slightly wider arc with lifted corners for friendly, approachable intelligence.
               - Dark purple visible across all screens.
               - Stroke width tuned for maximum clarity (3.0px hero / 3.6px small).
             */}
             <path
               d={isThinking
                 ? "M 38 64 L 62 64"
-                : "M 34 63.2 C 40 65.0, 60 65.0, 66 63.2"
+                : "M 32 62 C 38 67.5, 62 67.5, 68 62"
               }
               stroke={isThinking ? `url(#${shimmerId})` : "#201738"}
               strokeWidth={isBig ? "3.0" : "3.6"}
@@ -250,10 +236,10 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
               opacity="0.98"
             />
 
-            {/* Ultra-subtle lower lip reflection (Hero only) */}
+            {/* Playful smile lower reflection (Hero only) */}
             {isBig && !isThinking && (
               <path
-                d="M 43 68.5 Q 50 69.5 57 68.5"
+                d="M 42 69 Q 50 70.5 58 69"
                 stroke="#c084fc"
                 strokeWidth="1.2"
                 strokeLinecap="round"

@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Pinned Bottom Avatar in Collapsed Mode */}
         <div className="relative group cursor-pointer pt-2">
-          <div className="relative w-9 h-9 rounded-full bg-gradient-to-tr from-violet-600 via-indigo-600 to-purple-500 flex items-center justify-center text-xs font-semibold text-white shadow-md ring-2 ring-violet-500/30 group-hover:ring-violet-400/50 transition-all">
+          <div className="relative w-9 h-9 rounded-full bg-zinc-850 border border-zinc-700/80 flex items-center justify-center text-xs font-medium text-zinc-200 shadow-xs ring-1 ring-zinc-700/50 group-hover:border-zinc-600 group-hover:text-white transition-all">
             ES
             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0c0c0e]" />
           </div>
@@ -203,7 +203,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700/80 rounded-xl pl-8 pr-7 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 focus:bg-zinc-900 transition-all"
+              className="w-full bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700/80 rounded-xl pl-8 pr-7 py-1.5 text-xs text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-violet-500/50 focus:bg-zinc-900 transition-all"
             />
             {searchQuery ? (
               <button
@@ -412,8 +412,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="flex items-center justify-between p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-850 border border-zinc-800/80 hover:border-zinc-700 transition-all cursor-pointer group shadow-xs"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              {/* Dual-ring Glowing Avatar */}
-              <div className="relative w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 via-indigo-600 to-purple-500 flex items-center justify-center text-white text-xs font-semibold shrink-0 ring-2 ring-violet-400/30 group-hover:ring-violet-400/50 shadow-sm transition-all">
+              {/* Soft Muted Avatar */}
+              <div className="relative w-8 h-8 rounded-full bg-zinc-850 border border-zinc-700/80 flex items-center justify-center text-zinc-200 text-xs font-medium shrink-0 ring-1 ring-zinc-700/50 group-hover:border-zinc-600 group-hover:text-white shadow-xs transition-all">
                 ES
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0c0c0e]" />
               </div>
@@ -423,11 +423,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="text-xs font-semibold text-zinc-100 group-hover:text-white transition-colors truncate font-display">
                     Emerson Sterling
                   </span>
-                  <span className="px-1 py-0.2 rounded bg-gradient-to-r from-violet-600 to-indigo-600 text-[8px] font-bold text-white tracking-wider">
+                  <span className="px-1.5 py-0.2 rounded bg-zinc-800 border border-zinc-700 text-[8px] font-semibold text-zinc-300 tracking-wider">
                     PRO
                   </span>
                 </div>
-                <div className="text-[10px] text-zinc-400 truncate">
+                <div className="text-[10px] text-zinc-300 truncate">
                   sterlingr@gmail.com
                 </div>
               </div>

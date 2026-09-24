@@ -175,7 +175,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
             placeholder="Ask me anything..."
             rows={1}
             disabled={isLoading}
-            className="w-full resize-none bg-transparent text-[13.5px] sm:text-base text-zinc-100 placeholder-zinc-500 focus:outline-none leading-relaxed max-h-36 sm:max-h-48 min-h-[28px] sm:min-h-[38px]"
+            className="w-full resize-none bg-transparent text-[13.5px] sm:text-base text-zinc-100 placeholder-zinc-400 focus:outline-none leading-relaxed max-h-36 sm:max-h-48 min-h-[28px] sm:min-h-[38px]"
           />
         </div>
 
@@ -253,7 +253,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                   isListening
                     ? 'bg-rose-500 text-white animate-pulse'
-                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-750 hover:text-zinc-200 border border-zinc-700/60 hover:border-violet-500/30'
+                    : 'bg-violet-600/15 text-violet-300 hover:bg-violet-600/25 hover:text-violet-100 border border-violet-500/35 shadow-xs shadow-violet-950/40'
                 }`}
                 title={isListening ? 'Stop voice input' : 'Voice input'}
               >
@@ -265,7 +265,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
       </div>
 
       {/* Under-bar: Saved prompts & Attach file buttons */}
-      <div className="mt-1 sm:mt-2 px-1 sm:px-2 flex items-center justify-between text-[11px] sm:text-xs text-zinc-400">
+      <div className="mt-1 sm:mt-2 px-1 sm:px-2 flex items-center justify-between text-[11px] sm:text-xs text-zinc-300">
         <button
           type="button"
           onClick={onOpenSavedPrompts}
@@ -286,7 +286,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-lg border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/80 hover:text-zinc-200 transition-all cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-lg border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/80 hover:text-zinc-100 text-zinc-300 transition-all cursor-pointer"
           >
             <Paperclip className="w-3 h-3 text-zinc-400" />
             <span>Attach file</span>
