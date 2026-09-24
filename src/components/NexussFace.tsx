@@ -75,14 +75,14 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
         style={{
           borderRadius: '26%',
           background: isBig
-            ? 'radial-gradient(120% 120% at 30% 20%, #201738 0%, #110c22 55%, #080512 100%)'
-            : '#181329',
+            ? 'radial-gradient(120% 120% at 30% 20%, #E8E5DD 0%, #DCD9D0 55%, #D0CDBF 100%)'
+            : '#E8E5DD',
           boxShadow: isBig
-            ? 'inset 0 1.5px 2px rgba(255, 255, 255, 0.4), inset 0 -2px 6px rgba(0, 0, 0, 0.9), 0 8px 24px -4px rgba(0, 0, 0, 0.7), 0 0 20px -2px rgba(168, 85, 247, 0.25)'
-            : 'inset 0 1px 1.5px rgba(255, 255, 255, 0.35), inset 0 -1px 3px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6)',
+            ? 'inset 0 1.5px 2px rgba(255, 255, 255, 1), inset 0 -2px 6px rgba(0, 0, 0, 0.05), 0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 0 20px -2px rgba(168, 85, 247, 0.1)'
+            : 'inset 0 1px 1.5px rgba(255, 255, 255, 1), inset 0 -1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05)',
           border: isBig 
-            ? '1.25px solid rgba(216, 180, 254, 0.35)' 
-            : '1.25px solid rgba(192, 132, 252, 0.5)',
+            ? '1.25px solid rgba(200, 200, 200, 0.3)' 
+            : '1.25px solid rgba(200, 200, 200, 0.5)',
         }}
       >
         <svg
@@ -94,16 +94,15 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
           <defs>
             {/* Phosphor Gradient for eyes & mouth */}
             <linearGradient id={phosphorId} gradientUnits="userSpaceOnUse" x1="50" y1="20" x2="50" y2="72">
-              <stop offset="0%" stopColor="#d8b4fe" />
-              <stop offset="40%" stopColor="#f5edff" />
-              <stop offset="100%" stopColor="#c084fc" />
+              <stop offset="0%" stopColor="#201738" />
+              <stop offset="100%" stopColor="#201738" />
             </linearGradient>
 
             {/* Shimmer for thinking animation */}
             <linearGradient id={shimmerId} gradientUnits="userSpaceOnUse" x1="30" y1="60" x2="70" y2="70">
-              <stop offset="0%" stopColor="#c084fc" />
-              <stop offset="50%" stopColor="#d8b4fe" />
-              <stop offset="100%" stopColor="#c084fc" />
+              <stop offset="0%" stopColor="#201738" />
+              <stop offset="50%" stopColor="#4c1d95" />
+              <stop offset="100%" stopColor="#201738" />
             </linearGradient>
 
             {/* Squircle Chamfer Border (Hero) */}
@@ -236,7 +235,7 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
             {/* 
               2. FORMAL POISED MOUTH (QUIET CONFIDENCE):
               - Lifted corners by 2-3 degrees (y=63.2 vs center y=65.0).
-              - High-contrast platinum phosphor (#f5edff) visible across all screens.
+              - Dark purple visible across all screens.
               - Stroke width tuned for maximum clarity (3.0px hero / 3.6px small).
             */}
             <path
@@ -244,7 +243,7 @@ export const NexussFace: React.FC<NexussFaceProps> = ({
                 ? "M 38 64 L 62 64"
                 : "M 34 63.2 C 40 65.0, 60 65.0, 66 63.2"
               }
-              stroke={isThinking ? `url(#${shimmerId})` : "#f5edff"}
+              stroke={isThinking ? `url(#${shimmerId})` : "#201738"}
               strokeWidth={isBig ? "3.0" : "3.6"}
               strokeLinecap="round"
               fill="none"
