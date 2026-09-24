@@ -1,6 +1,6 @@
 [package]
 name = 'nexuss0781/nexussai'
-version = '0.1.6'
+version = '0.1.7'
 description = 'Nexuss AI - High performance AI assistant web application'
 
 [dependencies]
