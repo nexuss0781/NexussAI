@@ -1,8 +1,8 @@
 ext {
     // Capacitor 5 supports Android 5.1 (API 22) and newer.
     minSdkVersion = 22
-    compileSdkVersion = 33
-    targetSdkVersion = 33
+    compileSdkVersion = 35
+    targetSdkVersion = 35
     androidxActivityVersion = '1.7.0'
     androidxAppCompatVersion = '1.6.1'
     androidxCoordinatorLayoutVersion = '1.2.0'

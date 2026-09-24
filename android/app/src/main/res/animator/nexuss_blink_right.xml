@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="130"
+    android:repeatCount="1"
+    android:repeatMode="reverse"
+    android:interpolator="@android:interpolator/fast_out_slow_in"
+    android:propertyName="pathData"
+    android:valueFrom="M66.96,41.04 C66.96,39.05 65.35,37.44 63.36,37.44 C61.37,37.44 59.76,39.05 59.76,41.04 L59.76,48.96 C59.76,50.95 61.37,52.56 63.36,52.56 C65.35,52.56 66.96,50.95 66.96,48.96 Z"
+    android:valueTo="M66.96,45 C66.96,44.17 65.35,43.5 63.36,43.5 C61.37,43.5 59.76,44.17 59.76,45 L59.76,45 C59.76,45.83 61.37,46.5 63.36,46.5 C65.35,46.5 66.96,45.83 66.96,45 Z"
+    android:valueType="pathType" />

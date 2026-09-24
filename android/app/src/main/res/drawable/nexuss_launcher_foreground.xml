@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#E0DDD4"
+        android:pathData="M36,18 L72,18 C81.94,18 90,26.06 90,36 L90,72 C90,81.94 81.94,90 72,90 L36,90 C26.06,90 18,81.94 18,72 L18,36 C18,26.06 26.06,18 36,18 Z" />
+    <path android:fillColor="#201738" android:pathData="M41.04,41.04 L41.04,48.96 C41.04,50.95 39.43,52.56 37.44,52.56 C35.45,52.56 33.84,50.95 33.84,48.96 L33.84,41.04 C33.84,39.05 35.45,37.44 37.44,37.44 C39.43,37.44 41.04,39.05 41.04,41.04 Z" />
+    <path android:fillColor="#201738" android:pathData="M59.76,41.04 L59.76,48.96 C59.76,50.95 61.37,52.56 63.36,52.56 C65.35,52.56 66.96,50.95 66.96,48.96 L66.96,41.04 C66.96,39.05 65.35,37.44 63.36,37.44 C61.37,37.44 59.76,39.05 59.76,41.04 Z" />
+    <path android:fillColor="#201738" android:strokeColor="#201738" android:strokeWidth="2.3" android:strokeLineCap="round" android:fillAlpha="0" android:pathData="M41.04,62.64 C45.36,66.6 62.64,66.6 66.96,62.64" />
+</vector>
+
+<!-- The face is intentionally inset: Android launchers apply their own mask and scale. -->
