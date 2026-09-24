@@ -28,6 +28,57 @@ const getGeminiClient = () => {
   });
 };
 
+const FILESYSTEM_KIT_URL = (process.env.FILESYSTEM_KIT_URL || 'https://filesystem-kit.wasmer.app').replace(/\/$/, '');
+const filesystemToolDeclarations = [
+  { name: 'read_file', description: 'Read a text file from the connected workspace. Use this before editing.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, head: { type: 'integer' }, tail: { type: 'integer' }, start: { type: 'integer' }, end: { type: 'integer' } }, required: ['path'] } },
+  { name: 'write_file', description: 'Create or replace a text file in the connected workspace.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' }, append: { type: 'boolean' }, range: { type: 'object', properties: { start: { type: 'integer' }, end: { type: 'integer' } }, required: ['start', 'end'] } }, required: ['path', 'content'] } },
+  { name: 'modify_file', description: 'Replace one exact occurrence or rewrite a selected line range.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, match: { type: 'string' }, replacement: { type: 'string' }, occurrence: { type: 'integer' }, rewrite: { type: 'string' }, range: { type: 'object', properties: { start: { type: 'integer' }, end: { type: 'integer' } }, required: ['start', 'end'] } }, required: ['path'] } },
+  { name: 'list_files', description: 'List immediate files and directories inside a workspace directory.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, all: { type: 'boolean' } } } },
+  { name: 'glob_files', description: 'Find workspace paths matching a glob pattern.', parametersJsonSchema: { type: 'object', properties: { pattern: { type: 'string' }, cwd: { type: 'string' }, all: { type: 'boolean' } }, required: ['pattern'] } },
+  { name: 'grep_files', description: 'Search text lines in a workspace file or directory.', parametersJsonSchema: { type: 'object', properties: { pattern: { type: 'string' }, path: { type: 'string' }, ignoreCase: { type: 'boolean' }, all: { type: 'boolean' } }, required: ['pattern'] } },
+  { name: 'delete_file', description: 'Delete a workspace file or directory. Only use when explicitly requested.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, recursive: { type: 'boolean' }, force: { type: 'boolean' } }, required: ['path'] } },
+];
+
+async function callFilesystemKit(name: string, args: Record<string, any>) {
+  const request = async (endpoint: string, init?: RequestInit) => {
+    const response = await fetch(`${FILESYSTEM_KIT_URL}${endpoint}`, { ...init, headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) } });
+    const body = await response.text();
+    if (!response.ok) throw new Error(`Filesystem Kit ${response.status}: ${body.slice(0, 500)}`);
+    return (response.headers.get('content-type') || '').includes('application/json') ? JSON.parse(body) : body;
+  };
+  const query = (values: Record<string, any>) => new URLSearchParams(Object.entries(values).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)])).toString();
+  switch (name) {
+    case 'read_file': return request(`/api/read?${query(args)}`);
+    case 'write_file': return request('/api/write', { method: 'PUT', body: JSON.stringify(args) });
+    case 'modify_file': return request('/api/modify', { method: 'PATCH', body: JSON.stringify(args) });
+    case 'list_files': return request(`/api/list?${query({ path: args.path || '.', all: args.all })}`);
+    case 'glob_files': return request(`/api/glob?${query(args)}`);
+    case 'grep_files': return request(`/api/grep?${query({ pattern: args.pattern, path: args.path || '.', ignoreCase: args.ignoreCase, all: args.all })}`);
+    case 'delete_file': return request(`/api/delete?${query(args)}`, { method: 'DELETE' });
+    default: throw new Error(`Unknown filesystem tool: ${name}`);
+  }
+}
+
+async function generateWithTools(ai: any, model: string, contents: any[], config: any) {
+  const workingContents = [...contents];
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const response = await ai.models.generateContent({ model, contents: workingContents, config });
+    const candidate = response.candidates?.[0];
+    const functionCalls = response.functionCalls || candidate?.content?.parts?.filter((part: any) => part.functionCall).map((part: any) => part.functionCall) || [];
+    if (functionCalls.length === 0) return response;
+    if (candidate?.content) workingContents.push(candidate.content);
+    for (const call of functionCalls) {
+      try {
+        const result = await callFilesystemKit(call.name, call.args || {});
+        workingContents.push({ role: 'user', parts: [{ functionResponse: { name: call.name, response: { result } } }] });
+      } catch (error: any) {
+        workingContents.push({ role: 'user', parts: [{ functionResponse: { name: call.name, response: { error: error.message } } }] });
+      }
+    }
+  }
+  throw new Error('Filesystem tool loop exceeded the maximum number of steps');
+}
+
 app.post('/api/chat', async (req, res) => {
   try {
     const { 
@@ -84,9 +135,11 @@ app.post('/api/chat', async (req, res) => {
 Your communication style is intelligent, polished, structured, and direct.
 ${deepResearch || reqModel === 'deep-research' ? 'DEEPER RESEARCH MODE IS ENABLED: Provide an exhaustive, multi-faceted analysis with Executive Summary, Core Findings, Structural Comparison / Data, and Concrete Action Items.' : 'Provide clear, concise, and beautifully organized answers.'}
 ${isWebGroundingNeeded ? 'Incorporate up-to-date real-world context and structured citations where applicable.' : ''}
-Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.`;
+Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.
+You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
 
-        const systemInstruction = customSystemInstruction || defaultSystemInstruction;
+        const systemInstruction = `${customSystemInstruction || defaultSystemInstruction}
+You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
 
         // Format conversational history for Gemini
         const formattedContents = conversationList.map(m => ({
@@ -99,15 +152,10 @@ Use markdown formatting with bold headings, clean bullet points, code blocks wit
           temperature: deepResearch ? 0.3 : 0.7,
         };
 
-        if (isWebGroundingNeeded) {
-          genConfig.tools = [{ googleSearch: {} }];
-        }
+        genConfig.tools = [{ functionDeclarations: filesystemToolDeclarations }];
+        if (isWebGroundingNeeded) genConfig.tools.push({ googleSearch: {} });
 
-        const response = await ai.models.generateContent({
-          model: actualModel,
-          contents: formattedContents,
-          config: genConfig,
-        });
+        const response = await generateWithTools(ai, actualModel, formattedContents, genConfig);
 
         const replyText = response.text || "I processed your request, but received an empty response. How else may I assist you?";
         return res.json({

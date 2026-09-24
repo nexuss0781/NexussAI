@@ -3,3 +3,15 @@ name: nexussai
 owner: nexuss0781
 package: '.'
 app_id: da_KwGIWtMUpWzX
+env:
+  FILESYSTEM_KIT_URL: https://filesystem-kit.wasmer.app
+health_checks:
+  - http:
+      method: get
+      path: /api/health
+      interval: 30s
+      timeout: 10s
+      unhealthy_threshold: 2
+      healthy_threshold: 1
+      expected_status_codes:
+        - 200
