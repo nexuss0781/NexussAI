@@ -15,25 +15,9 @@
     "build:capacitor": "npm run cap:build && cd android && bash ./gradlew assembleDebug && cp app/build/outputs/apk/debug/app-debug.apk ../NexussAI_Capacitor.apk"
   },
   "dependencies": {
-    "@capacitor/android": "5.7.8",
-    "@capacitor/core": "5.7.8",
     "@google/genai": "^2.4.0",
-    "@tailwindcss/vite": "^4.3.3",
-    "@vitejs/plugin-react": "^6.1.1",
     "dotenv": "^17.2.3",
-    "expo": "^57.0.24",
-    "expo-blur": "^57.0.3",
-    "expo-clipboard": "^57.0.2",
-    "expo-linear-gradient": "^57.0.2",
-    "expo-status-bar": "^57.0.1",
-    "expo-updates": "^57.0.23",
-    "express": "^4.21.2",
-    "lucide-react": "^0.546.0",
-    "lucide-react-native": "^1.47.0",
-    "motion": "^12.23.24",
-    "react": "^19.0.1",
-    "react-dom": "^19.0.1",
-    "vite": "^8.3.0"
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@capacitor/cli": "5.7.8",
@@ -46,6 +30,22 @@
     "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "@capacitor/android": "5.7.8",
+    "@capacitor/core": "5.7.8",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "expo": "^57.0.24",
+    "expo-blur": "^57.0.3",
+    "expo-clipboard": "^57.0.2",
+    "expo-linear-gradient": "^57.0.2",
+    "expo-status-bar": "^57.0.1",
+    "expo-updates": "^57.0.23",
+    "lucide-react": "^0.546.0",
+    "lucide-react-native": "^1.47.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^8.3.0"
   }
 }
