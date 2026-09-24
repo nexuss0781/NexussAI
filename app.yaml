@@ -6,7 +6,7 @@ app_id: da_KwGIWtMUpWzX
 annotations:
   anybuild.run/config:
     commands:
-      start: node server.js
+      start: node /server.js
     edgejs_enable: true
     edgejs_precompile: true
     name: out
