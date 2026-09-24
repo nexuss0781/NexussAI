@@ -4,7 +4,8 @@ name: nexussai
 package: .
 env:
   FILESYSTEM_KIT_URL: https://filesystem-kit.wasmer.app
-  STATIC_DIR: /public
+  NODE_ENV: production
+  STATIC_DIR: /app/dist
 annotations:
   anybuild.run/config:
     commands:
