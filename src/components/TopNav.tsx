@@ -71,17 +71,10 @@ export const TopNav: React.FC<TopNavProps> = ({
         )}
       </div>
 
-      {/* CENTER: Brand Nexuss AI */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5 pointer-events-none select-none">
-        <div className="w-5 h-5 flex items-center justify-center">
-          <NexussFace size="xs" animated={false} />
-        </div>
-        <span className="font-semibold text-sm sm:text-base tracking-tight text-white/95">
-          Nexuss AI
-        </span>
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      {/* CENTER: Brand Nexuss AI with unique bespoke typography */}
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none select-none">
+        <span className="font-['Outfit',sans-serif] text-base sm:text-lg font-semibold tracking-tight bg-gradient-to-r from-zinc-100 via-white to-zinc-300 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(255,255,255,0.12)]">
+          Nexuss <span className="font-['Instrument_Serif',serif] italic font-normal text-violet-400 text-lg sm:text-xl ml-0.5 tracking-normal">AI</span>
         </span>
       </div>
 
