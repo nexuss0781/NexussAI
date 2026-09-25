@@ -115,11 +115,6 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               {/* Header meta badge */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-zinc-200">Nexuss AI</span>
-                {msg.model && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-400">
-                    {msg.model}
-                  </span>
-                )}
                 {msg.isDeepResearch && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-300">
                     <Sparkles className="w-2.5 h-2.5" /> Deeper Research

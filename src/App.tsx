@@ -33,7 +33,6 @@ export default function App() {
   });
 
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
-  const [currentModel, setCurrentModel] = useState('gemini-3.8-flash');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showDecorations, setShowDecorations] = useState(() => {
     try {
@@ -137,7 +136,7 @@ export default function App() {
         dateGroup: 'Today',
         createdAt: new Date().toISOString(),
         messages: [userMsg],
-        model: currentModel,
+        model: 'nexuss-ai',
       };
       setThreads(prev => [newThread, ...prev]);
       setActiveThreadId(newThread.id);
@@ -169,7 +168,6 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           prompt: promptToSend,
-          model: currentModel,
           systemInstruction,
           webSearch: options.webSearch,
           deepResearch: options.deepResearch,
@@ -191,8 +189,6 @@ export default function App() {
         id: `msg-${Date.now() + 1}`,
         role: 'assistant',
         content: assistantText,
-        model: data.model || currentModel,
-        provider: data.provider || 'OmniRoute Gateway',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isDeepResearch: options.deepResearch,
         isWebSearch: options.webSearch,
@@ -314,11 +310,6 @@ export default function App() {
           
           {/* Top Bar Navigation */}
           <TopNav
-            currentModel={currentModel}
-            onSelectModel={(model) => {
-              setCurrentModel(model);
-              showToast(`Switched to ${model.includes('pro') ? 'Nexuss 3.1 Pro' : model.includes('research') ? 'Deep Research' : 'Nexuss 3.8 Flash'}`);
-            }}
             onExport={handleExport}
             onShare={handleShare}
             onUpgrade={() => setUpgradeOpen(true)}

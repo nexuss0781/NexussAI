@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  ChevronDown, 
   MoreHorizontal, 
   Share2, 
   Download, 
@@ -8,15 +7,11 @@ import {
   Moon, 
   Sun, 
   Trash2,
-  Cpu,
-  Sparkles,
   PanelLeftOpen
 } from 'lucide-react';
 import { NexussFace } from './NexussFace';
 
 interface TopNavProps {
-  currentModel: string;
-  onSelectModel: (model: string) => void;
   onExport: () => void;
   onShare: () => void;
   onUpgrade: () => void;
@@ -30,8 +25,6 @@ interface TopNavProps {
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
-  currentModel,
-  onSelectModel,
   onExport,
   onShare,
   onUpgrade,
@@ -43,70 +36,11 @@ export const TopNav: React.FC<TopNavProps> = ({
   showDecorations,
   onToggleDecorations,
 }) => {
-  const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
-
-  const models = [
-    { 
-      id: 'auto', 
-      label: 'OmniRoute Auto', 
-      desc: 'Intelligent multi-model dynamic router across top frontier providers',
-      badge: 'Smart',
-      icon: Sparkles
-    },
-    { 
-      id: 'gemini-3.8-flash', 
-      label: 'Nexuss 3.8 Flash', 
-      desc: 'Ultra-fast low-latency responses & deep context reasoning',
-      badge: 'Fast',
-      icon: Cpu
-    },
-    { 
-      id: 'deep-research', 
-      label: 'Deep Research Agent', 
-      desc: 'Extended chain-of-thought analysis with multi-angle synthesis',
-      badge: 'Reasoning',
-      icon: Zap
-    },
-    { 
-      id: 'gemini-3.1-pro', 
-      label: 'Nexuss 3.1 Pro', 
-      desc: 'Maximized cognitive reasoning for complex system design & code',
-      badge: 'Pro',
-      icon: Cpu
-    },
-    { 
-      id: 'claude-3-5-sonnet', 
-      label: 'Claude 3.5 Sonnet', 
-      desc: 'Anthropic state-of-the-art coding and nuanced analytical writing',
-      badge: 'Anthropic',
-      icon: Sparkles
-    },
-    { 
-      id: 'deepseek-chat', 
-      label: 'DeepSeek V3', 
-      desc: 'High throughput MoE architecture for coding & technical tasks',
-      badge: 'DeepSeek',
-      icon: Zap
-    },
-    { 
-      id: 'gpt-4o', 
-      label: 'GPT-4o Omnimodal', 
-      desc: 'OpenAI flagship multi-modal reasoning through OmniRoute Gateway',
-      badge: 'OpenAI',
-      icon: Sparkles
-    }
-  ];
-
-  const activeModelObj = models.find(m => m.id === currentModel) || models[0];
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setModelDropdownOpen(false);
-      }
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
         setMoreMenuOpen(false);
       }
@@ -116,8 +50,8 @@ export const TopNav: React.FC<TopNavProps> = ({
   }, []);
 
   return (
-    <header className="h-14 border-b border-zinc-800/80 px-3 sm:px-6 flex items-center justify-between select-none z-30 shrink-0 transition-all duration-300 backdrop-blur-md bg-[#0c0c0e]/95 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-      {/* LEFT: Mobile Sidebar Trigger + Model Selector Dropdown */}
+    <header className="relative h-14 border-b border-zinc-800/80 px-3 sm:px-6 flex items-center justify-between select-none z-30 shrink-0 transition-all duration-300 backdrop-blur-md bg-[#0c0c0e]/95 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+      {/* LEFT: Mobile Sidebar Trigger */}
       <div className="flex items-center gap-2">
         {onToggleSidebar && (
           <button
@@ -135,57 +69,20 @@ export const TopNav: React.FC<TopNavProps> = ({
             </div>
           </button>
         )}
+      </div>
 
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-zinc-800/60 transition-colors cursor-pointer group"
-          >
-            <span className="font-medium text-xs sm:text-sm text-zinc-200 group-hover:text-white transition-colors">
-              {activeModelObj.label}
-            </span>
-            <ChevronDown className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 ${modelDropdownOpen ? 'rotate-180 text-zinc-300' : ''}`} />
-          </button>
-
-          {modelDropdownOpen && (
-            <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl bg-[#141418] border border-zinc-800 shadow-2xl p-1.5 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
-              <div className="px-3 py-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                Select Intelligence Model
-              </div>
-              {models.map((m) => {
-                const Icon = m.icon;
-                const isSelected = m.id === currentModel;
-                return (
-                  <button
-                    key={m.id}
-                    onClick={() => {
-                      onSelectModel(m.id);
-                      setModelDropdownOpen(false);
-                    }}
-                    className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-colors cursor-pointer ${
-                      isSelected ? 'bg-zinc-800/90 border border-violet-500/40' : 'hover:bg-zinc-800/50'
-                    }`}
-                  >
-                    <div className={`p-1.5 rounded-lg mt-0.5 ${isSelected ? 'bg-violet-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-xs text-zinc-200">{m.label}</span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                          isSelected ? 'bg-violet-500/20 text-violet-300' : 'bg-zinc-800 text-zinc-400'
-                        }`}>
-                          {m.badge}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-zinc-400 line-clamp-1 mt-0.5">{m.desc}</p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+      {/* CENTER: Brand Nexuss AI */}
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5 pointer-events-none select-none">
+        <div className="w-5 h-5 flex items-center justify-center">
+          <NexussFace size="xs" animated={false} />
         </div>
+        <span className="font-semibold text-sm sm:text-base tracking-tight text-white/95">
+          Nexuss AI
+        </span>
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
       </div>
 
       {/* RIGHT: Actions Menu */}

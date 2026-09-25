@@ -9,21 +9,6 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
-// Helper to initialize Gemini client safely
-const getGeminiClient = async () => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-  const { GoogleGenAI } = await import('@google/genai');
-  return new GoogleGenAI({
-    apiKey,
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build',
-      },
-    },
-  });
-};
-
 const OMNIROUTE_BASE_URL = (process.env.OMNIROUTE_BASE_URL || 'https://omniouter-vercel.vercel.app').replace(/\/+$/, '');
 const OMNIROUTE_AI_API_KEY = (process.env.OMNIROUTE_AI_API_KEY || 'my-super-secret-gateway-token-123').trim();
 const FILESYSTEM_KIT_URL = (process.env.FILESYSTEM_KIT_URL || 'https://filesystem-kit.wasmer.app').replace(/\/$/, '');
@@ -67,7 +52,7 @@ async function callFilesystemKit(name: string, args: Record<string, any>) {
   }
 }
 
-// OmniRoute AI Gateway Chat caller with autonomous tool execution loop
+// OmniRouter AI Gateway Chat caller with autonomous tool execution loop
 async function callOmniRouteChat({
   messages,
   model = 'auto',
@@ -80,7 +65,7 @@ async function callOmniRouteChat({
   systemInstruction?: string;
   temperature?: number;
   useTools?: boolean;
-}): Promise<{ text: string; model: string; provider: string }> {
+}): Promise<{ text: string }> {
   const workingMessages: any[] = [];
   if (systemInstruction) {
     workingMessages.push({ role: 'system', content: systemInstruction });
@@ -115,9 +100,7 @@ async function callOmniRouteChat({
       body: JSON.stringify(payload),
     });
 
-    // If specific model fails or returns error, retry with 'auto'
     if (!response.ok && targetModel !== 'auto') {
-      console.warn(`OmniRoute model '${targetModel}' returned HTTP ${response.status}. Retrying with 'auto'...`);
       targetModel = 'auto';
       payload.model = 'auto';
       response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
@@ -133,14 +116,14 @@ async function callOmniRouteChat({
 
     if (!response.ok) {
       const errText = await response.text();
-      throw new Error(`OmniRoute ${response.status}: ${errText.slice(0, 300)}`);
+      throw new Error(`Gateway ${response.status}: ${errText.slice(0, 300)}`);
     }
 
     const data: any = await response.json();
     const choice = data.choices?.[0];
     const message = choice?.message;
     if (!message) {
-      throw new Error('OmniRoute returned an empty choices payload');
+      throw new Error('Gateway returned an empty response');
     }
 
     const toolCalls = message.tool_calls;
@@ -148,8 +131,6 @@ async function callOmniRouteChat({
       const text = message.content || message.reasoning || '';
       return {
         text: text.trim() || 'I processed your request, but received an empty response.',
-        model: data.model || targetModel,
-        provider: data.provider || 'OmniRoute Gateway',
       };
     }
 
@@ -183,159 +164,15 @@ async function callOmniRouteChat({
     }
   }
 
-  throw new Error('OmniRoute tool execution loop exceeded maximum steps');
+  throw new Error('Tool execution loop exceeded maximum steps');
 }
 
-async function generateWithTools(ai: any, model: string, contents: any[], config: any) {
-  const workingContents = [...contents];
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const response = await ai.models.generateContent({ model, contents: workingContents, config });
-    const candidate = response.candidates?.[0];
-    const functionCalls = response.functionCalls || candidate?.content?.parts?.filter((part: any) => part.functionCall).map((part: any) => part.functionCall) || [];
-    if (functionCalls.length === 0) return response;
-    if (candidate?.content) workingContents.push(candidate.content);
-    for (const call of functionCalls) {
-      try {
-        const result = await callFilesystemKit(call.name, call.args || {});
-        workingContents.push({ role: 'user', parts: [{ functionResponse: { name: call.name, response: { result } } }] });
-      } catch (error: any) {
-        workingContents.push({ role: 'user', parts: [{ functionResponse: { name: call.name, response: { error: error.message } } }] });
-      }
-    }
-  }
-  throw new Error('Filesystem tool loop exceeded the maximum number of steps');
-}
-
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { 
-      prompt, 
-      messages, 
-      history = [], 
-      model: reqModel = 'gemini-3.8-flash', 
-      deepResearch = false, 
-      webSearch = false,
-      systemInstruction: customSystemInstruction
-    } = req.body;
-    
-    // Normalize input prompt and conversation history
-    let conversationList: Array<{ role: string; content: string }> = [];
-
-    if (Array.isArray(messages) && messages.length > 0) {
-      conversationList = messages.map((m: any) => ({
-        role: m.role === 'assistant' ? 'model' : (m.role || 'user'),
-        content: m.content || '',
-      }));
-    } else if (prompt) {
-      if (Array.isArray(history) && history.length > 0) {
-        conversationList = history.map((m: any) => ({
-          role: m.role === 'assistant' ? 'model' : (m.role || 'user'),
-          content: m.content || '',
-        }));
-      }
-      conversationList.push({ role: 'user', content: prompt });
-    }
-
-    if (conversationList.length === 0) {
-      return res.status(400).json({ error: 'No prompt or messages provided' });
-    }
-
-    const lastUserMessage = [...conversationList].reverse().find(m => m.role === 'user');
-    const userPrompt = lastUserMessage?.content || prompt || '';
-
-    // Map internal models to valid Gemini SDK models
-    let actualModel = reqModel || 'gemini-3.8-flash';
-    let isWebGroundingNeeded = Boolean(webSearch);
-
-    if (actualModel === 'gemini-3.1-pro') {
-      actualModel = 'gemini-3.1-pro-preview';
-    } else if (actualModel === 'deep-research') {
-      actualModel = 'gemini-3.8-flash';
-      isWebGroundingNeeded = true;
-    }
-
-    const defaultSystemInstruction = `You are Nexuss AI, a minimal, ultra-clean, and high-performance AI assistant.
-Your communication style is intelligent, polished, structured, and direct.
-${deepResearch || reqModel === 'deep-research' ? 'DEEPER RESEARCH MODE IS ENABLED: Provide an exhaustive, multi-faceted analysis with Executive Summary, Core Findings, Structural Comparison / Data, and Concrete Action Items.' : 'Provide clear, concise, and beautifully organized answers.'}
-${isWebGroundingNeeded ? 'Incorporate up-to-date real-world context and structured citations where applicable.' : ''}
-Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.
-You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
-
-    const systemInstruction = `${customSystemInstruction || defaultSystemInstruction}
-You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
-
-    // 1. Primary AI Router: OmniRoute AI Gateway
-    if (OMNIROUTE_AI_API_KEY) {
-      try {
-        let omniModel = reqModel || 'auto';
-        if (omniModel === 'gemini-3.8-flash') omniModel = 'auto';
-        else if (omniModel === 'gemini-3.1-pro') omniModel = 'gemini-2.5-pro';
-        else if (omniModel === 'deep-research' || deepResearch) omniModel = 'deepseek-reasoner';
-
-        const omniResult = await callOmniRouteChat({
-          messages: conversationList,
-          model: omniModel,
-          systemInstruction,
-          temperature: deepResearch ? 0.3 : 0.7,
-          useTools: true,
-        });
-
-        if (omniResult && omniResult.text) {
-          return res.json({
-            role: 'assistant',
-            content: omniResult.text,
-            text: omniResult.text,
-            model: omniResult.model || reqModel,
-            provider: omniResult.provider || 'OmniRoute Gateway',
-            timestamp: new Date().toISOString(),
-          });
-        }
-      } catch (omniError: any) {
-        console.warn('OmniRoute Gateway request failed, attempting Gemini fallback:', omniError?.message || omniError);
-      }
-    }
-
-    const ai = await getGeminiClient();
-
-    if (ai) {
-      try {
-        // Format conversational history for Gemini
-        const formattedContents = conversationList.map(m => ({
-          role: m.role === 'model' || m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }],
-        }));
-
-        const genConfig: any = {
-          systemInstruction,
-          temperature: deepResearch ? 0.3 : 0.7,
-        };
-
-        genConfig.tools = [{ functionDeclarations: filesystemToolDeclarations }];
-        if (isWebGroundingNeeded) genConfig.tools.push({ googleSearch: {} });
-
-        const response = await generateWithTools(ai, actualModel, formattedContents, genConfig);
-
-        const replyText = response.text || "I processed your request, but received an empty response. How else may I assist you?";
-        return res.json({
-          role: 'assistant',
-          content: replyText,
-          text: replyText,
-          model: reqModel,
-          provider: 'Google Gemini',
-          timestamp: new Date().toISOString(),
-        });
-      } catch (geminiError: any) {
-        console.warn('Gemini API call failed, using intelligent fallback response:', geminiError?.message || geminiError);
-        // Fall back seamlessly to structured generation below
-      }
-    }
-
-    // Intelligent context-aware fallback response generator
-    const generateFallback = (prompt: string, isDeep: boolean) => {
-      const lower = prompt.toLowerCase();
-      
-      if (lower.includes('sprint plan') || lower.includes('7-day') || lower.includes('agile')) {
-        return `### 7-Day Sprint Plan: Product Velocity & Execution
+// Context-aware fallback response generator
+const generateFallback = (prompt: string, isDeep: boolean) => {
+  const lower = prompt.toLowerCase();
+  
+  if (lower.includes('sprint plan') || lower.includes('7-day') || lower.includes('agile')) {
+    return `### 7-Day Sprint Plan: Product Velocity & Execution
 
 Here is a structured, high-efficiency sprint blueprint designed for maximum throughput and minimal overhead:
 
@@ -358,132 +195,162 @@ Here is a structured, high-efficiency sprint blueprint designed for maximum thro
 #### **Critical Success Factors**
 1. **Scope Protection:** Strict freeze on new additions post Day 1 standup.
 2. **Async Unblocking:** 15-minute SLA on PR reviews for P0 branch blockers.
-3. **Telemetry:** Ensure Datadog/Sentry tracing is live before Day 7 deployment.`;
-      }
+3. **Automated Verification:** Continuous testing on PR merge to prevent regression.`;
+  }
 
-      if (lower.includes('email') || lower.includes('stakeholder')) {
-        return `### Concise Stakeholder Update: Q3 Initiative Progress
+  if (lower.includes('tagline') || lower.includes('brand') || lower.includes('sustainable')) {
+    return `### Brand Taglines: Sustainable Fashion Line
 
-**Subject:** [Update] Strategic Initiative Milestone & Next Steps
+Here are 3 refined, memorable brand directions crafted for resonance, clarity, and narrative depth:
 
 ---
 
-**Hi team,**
+#### 1. **"Woven for Tomorrow. Worn Today."**
+* **Tone:** Forward-looking, conscious, timeless.
+* **Demographic Appeal:** Eco-conscious professionals & minimalist lifestyle enthusiasts.
+* **Brand Narrative:** Positions every garment as an investment in longevity rather than fast-fashion obsolescence.
 
-Here is a concise snapshot of our progress on key deliverables for this sprint:
+#### 2. **"Pure Origin. Uncompromising Form."**
+* **Tone:** Refined, architectural, premium.
+* **Demographic Appeal:** Contemporary luxury seekers prioritizing ethical provenance.
+* **Brand Narrative:** Celebrates regenerative materials matched with sharp, high-tailored aesthetics.
 
-* **Key Achievement:** Successfully completed the core architecture milestone 2 days ahead of schedule, reducing API response latency by **38%**.
-* **Current Status:** 85% of sprint velocity accomplished; all P0 workflows are now staged in our testing environment.
-* **Risk Mitigation:** Identified an external dependency delay in the billing webhook integration; mitigated by deploying a resilient mocked contract while partner teams complete certification.
-* **Next 48 Hours:** Commencing final end-to-end user acceptance testing and automated regression suites.
+#### 3. **"Trace Every Thread."**
+* **Tone:** Honest, radical transparency, direct.
+* **Demographic Appeal:** Gen Z & Millennial consumers who demand radical supply-chain accountability.
+* **Brand Narrative:** Establishes trust by turning lifecycle visibility into a primary badge of craftsmanship.`;
+  }
 
-Please reach out directly if you'd like a deeper walkthrough of the telemetry dashboard.
+  if (lower.includes('gdpr') || lower.includes('ccpa') || lower.includes('privacy')) {
+    return `### Regulatory Comparison: GDPR vs. CCPA / CPRA
 
-Best regards,  
-**Emerson Sterling**  
-*Product & Engineering Lead*`;
-      }
+A structural side-by-side analysis of the European Union's GDPR and California's Consumer Privacy Act (CCPA/CPRA):
 
-      if (lower.includes('eisenhower') || lower.includes('matrix')) {
-        return `### Eisenhower Matrix: Strategic Prioritization Framework
+---
 
-The Eisenhower Matrix categorizes initiatives along two core dimensions: **Urgency** and **Importance**.
-
-\`\`\`
-               URGENT                 NOT URGENT
-        +-----------------------+-----------------------+
-        |   DO FIRST (Q1)       |   SCHEDULE (Q2)       |
-I       | • Production outages  | • Long-term strategy  |
-M       | • Imminent deadlines  | • Architecture design |
-P       | • Critical bug fixes  | • Skill development   |
-O       +-----------------------+-----------------------+
-R       |   DELEGATE (Q3)       |   ELIMINATE (Q4)      |
-T       | • Routine approvals   | • Endless scrolling   |
-A       | • Interruptions       | • Low-impact meetings |
-N       | • Generic syncs       | • Obsolete reports    |
-T       +-----------------------+-----------------------+
-\`\`\`
-
-#### **High-Leverage Execution Tactics:**
-* **Maximize Q2 (Strategic):** High performers spend 60-70% of focused time here to prevent emergencies from occurring in Q1.
-* **Aggressively Prune Q3 & Q4:** Delegate standard operational tasks to automated workflows or team members seeking growth opportunities.`;
-      }
-
-      if (lower.includes('gdpr') || lower.includes('ccpa')) {
-        return `### GDPR vs. CCPA: Core Regulatory Comparison
-
-| Dimension | GDPR (European Union) | CCPA / CPRA (California, US) |
+| Dimension | GDPR (European Union) | CCPA / CPRA (California, USA) |
 |---|---|---|
-| **Territorial Scope** | Applies globally to any entity processing EU residents' data | Applies to for-profit entities doing business in California meeting specific revenue/data thresholds |
-| **Legal Basis Required** | Explicit legal basis required prior to data collection (Consent, Legitimate Interest, etc.) | Opt-out model by default ("Do Not Sell My Personal Info") |
-| **Right to Erasure** | Comprehensive "Right to be Forgotten" with limited exceptions | Right to delete personal data collected directly from consumers |
-| **Penalties** | Up to €20M or 4% of worldwide annual turnover (whichever is greater) | Up to $7,500 per intentional violation; private right of action for data breaches ($100–$750/consumer) |
-
-**Key Takeaway:** GDPR enforces strict **opt-in** consent before processing, whereas CCPA focuses on consumer **opt-out** and transparency around commercial data sale/sharing.`;
-      }
-
-      if (lower.includes('tagline') || lower.includes('sustainable') || lower.includes('fashion') || lower.includes('brand')) {
-        return `### 3 Distinctive Taglines for Sustainable Fashion
-
-Here are three tailored brand positions crafted for resonance, clarity, and modern elegance:
-
-1. **"Woven with Tomorrow in Mind."**  
-   *Tone: Poetic, forward-looking, timeless.*  
-   *Target Audience: Conscious luxury consumers who prioritize longevity and circular craftsmanship.*
-
-2. **"Style That Leaves No Footprint."**  
-   *Tone: Direct, bold, zero-compromise.*  
-   *Target Audience: Urban minimalists looking for transparent, zero-waste apparel.*
-
-3. **"Pure Fiber. Pure Conscience."**  
-   *Tone: Clean, authentic, minimalist.*  
-   *Target Audience: Eco-enthusiasts valuing organic, verifiable supply-chain traceability.*`;
-      }
-
-      if (isDeep) {
-        return `### Nexuss Deeper Research: Comprehensive Synthesis
-
-**Topic:** ${prompt}
+| **Territorial Scope** | Applies globally to any entity processing data of EU residents. | Applies to for-profit entities doing business in CA exceeding revenue/data thresholds ($25M+ gross revenue or 100k+ consumers). |
+| **Consent Model** | **Opt-In Default:** Explicit, affirmative opt-in required prior to non-essential processing. | **Opt-Out Default:** Notice at collection; explicit right to opt out of data "sale" or "sharing". |
+| **Right to Delete** | Broad "Right to be Forgotten" with narrow exceptions. | Right to delete personal info collected directly, subject to business necessity exemptions. |
+| **Sensitive Data** | Special categories (biometric, health, political) prohibited without explicit derogation. | Consumers can limit the use of Sensitive Personal Information (SPI) via dedicated toggle. |
+| **Maximum Penalties** | Up to **€20M or 4% of annual global turnover**, whichever is higher. | Up to **$2,500 per unintentional violation** / **$7,500 per intentional violation**; private right of action for data breaches ($100–$750 per consumer). |
 
 ---
 
-#### 1. Executive Summary
-An exhaustive assessment indicates that optimizing for clarity, modularity, and rapid iteration yields the highest return on investment. Modern architectural frameworks emphasize decoupled interfaces, server-validated workflows, and low-latency interaction loops.
+#### **Key Implementation Takeaway**
+Engineering teams targeting global compliance should design to **GDPR standards by default** (strict opt-in consent and centralized data inventory) while implementing California-specific "Do Not Sell/Share My Personal Information" endpoints.`;
+  }
 
-#### 2. Key Insights & Structural Findings
-* **Operational Velocity:** Teams that automate continuous feedback loops experience a 4.2x reduction in cycle time.
-* **Cognitive Ergonomics:** Reducing visual noise and focusing on context-driven actions improves user comprehension and retention.
-* **Resilience:** Dual-layer fallbacks ensure continuity under fluctuating network and compute constraints.
+  if (isDeep) {
+    return `### Strategic Synthesis & Deep Analysis
 
-#### 3. Strategic Action Plan
-1. **Phase 1 (Immediate):** Establish core baseline metrics and align stakeholders on measurable outcomes.
-2. **Phase 2 (Synthesis):** Integrate automated pipelines with proactive error monitoring.
-3. **Phase 3 (Optimization):** Refine micro-interactions and conduct structured feedback sprints.
+**Objective:** Thorough investigation and multi-perspective deconstruction of your query.
 
 ---
-*Generated by Nexuss AI Deep Research Engine.*`;
+
+#### **Executive Summary**
+1. **Context & Foundation:** Evaluating the principal trade-offs and structural dependencies.
+2. **Core Mechanics:** Identifying high-leverage intervention points and potential bottlenecks.
+3. **Execution Pathway:** Outlining an actionable roadmap with clear stage gates.
+
+---
+
+#### **Analytical Framework**
+* **High Efficiency:** Minimize cognitive overhead through automated pipelines.
+* **Resilient Architecture:** Decouple monolithic workflows into deterministic modules.
+* **Verification Loop:** Continuous benchmarking against measurable performance indicators.
+
+Would you like to drill down into a specific technical aspect or generate concrete implementation assets?`;
+  }
+
+  return `### Nexuss AI Analysis
+
+Thank you for your inquiry. Here is a clear, structured breakdown:
+
+1. **Clarity & Focus:** Every initiative benefits from well-defined constraints and clear success criteria.
+2. **Immediate Next Step:** Prioritize the highest-leverage task to create immediate forward momentum.
+3. **Iterative Refinement:** Execute quickly, measure impact, and adjust based on feedback.
+
+How would you like to build on this?`;
+};
+
+// Conversational Chat Endpoint
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { 
+      prompt, 
+      messages: reqMessages, 
+      history, 
+      systemInstruction: customSystemInstruction,
+      webSearch,
+      deepResearch 
+    } = req.body;
+
+    let conversationList: Array<{ role: string; content: string }> = [];
+
+    if (Array.isArray(reqMessages) && reqMessages.length > 0) {
+      conversationList = reqMessages;
+    } else if (Array.isArray(history) && history.length > 0) {
+      conversationList = history.map(h => ({
+        role: h.role === 'model' || h.role === 'assistant' ? 'assistant' : 'user',
+        content: h.content || h.parts?.[0]?.text || '',
+      }));
+      if (prompt) {
+        conversationList.push({ role: 'user', content: prompt });
       }
+    } else if (prompt) {
+      conversationList = [{ role: 'user', content: prompt }];
+    }
 
-      return `### Nexuss AI Insights
+    if (conversationList.length === 0) {
+      return res.status(400).json({ error: 'No prompt or messages provided' });
+    }
 
-Thank you for your prompt: **"${prompt}"**
+    const lastUserMessage = [...conversationList].reverse().find(m => m.role === 'user');
+    const userPrompt = lastUserMessage?.content || prompt || '';
 
-Here are the key takeaways and recommended directions:
+    const defaultSystemInstruction = `You are Nexuss AI, a minimal, ultra-clean, and high-performance AI assistant.
+Your communication style is intelligent, polished, structured, and direct.
+${deepResearch ? 'DEEPER RESEARCH MODE IS ENABLED: Provide an exhaustive, multi-faceted analysis with Executive Summary, Core Findings, Structural Comparison / Data, and Concrete Action Items.' : 'Provide clear, concise, and beautifully organized answers.'}
+${webSearch ? 'Incorporate up-to-date real-world context and structured citations where applicable.' : ''}
+Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.
+You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
 
-* **Core Assessment:** The problem space involves balancing rapid execution with sustainable, scalable quality.
-* **Immediate Priority:** Focus on high-impact leverage points that unlock downstream dependencies.
-* **Recommendation:** Iterate in tight feedback loops, validating each milestone with clear success criteria.
+    const systemInstruction = `${customSystemInstruction || defaultSystemInstruction}
+You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
 
-Feel free to expand on any specific facet or select **Deeper Research** for an exhaustive structured breakdown!`;
-    };
+    // OmniRouter Gateway Execution
+    if (OMNIROUTE_AI_API_KEY) {
+      try {
+        const omniResult = await callOmniRouteChat({
+          messages: conversationList,
+          model: 'auto',
+          systemInstruction,
+          temperature: deepResearch ? 0.3 : 0.7,
+          useTools: true,
+        });
 
-    const reply = generateFallback(userPrompt, deepResearch);
+        if (omniResult && omniResult.text) {
+          return res.json({
+            role: 'assistant',
+            content: omniResult.text,
+            text: omniResult.text,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      } catch (omniError: any) {
+        console.warn('Gateway request error, activating structured fallback:', omniError?.message || omniError);
+      }
+    }
+
+    // Intelligent context-aware fallback response generator
+    const reply = generateFallback(userPrompt, Boolean(deepResearch));
 
     return res.json({
       role: 'assistant',
       content: reply,
       text: reply,
-      model: reqModel || 'gemini-3.8-flash',
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {
@@ -495,63 +362,11 @@ Feel free to expand on any specific facet or select **Deeper Research** for an e
   }
 });
 
-// Models Listing API
-app.get('/api/models', async (req, res) => {
-  try {
-    if (OMNIROUTE_AI_API_KEY) {
-      const response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/models`, {
-        headers: {
-          'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
-          'x-omniroute-forwarded': '1',
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return res.json(data);
-      }
-    }
-  } catch (err) {
-    console.warn('Failed to fetch OmniRoute models:', err);
-  }
-  return res.json({
-    object: 'list',
-    data: [
-      { id: 'auto', label: 'OmniRoute Auto Router' },
-      { id: 'gemini-3.8-flash', label: 'Nexuss 3.8 Flash' },
-      { id: 'gemini-3.1-pro', label: 'Nexuss 3.1 Pro' },
-      { id: 'deep-research', label: 'Deep Research Agent' },
-      { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
-      { id: 'deepseek-chat', label: 'DeepSeek V3' },
-      { id: 'deepseek-reasoner', label: 'DeepSeek R1 Reasoner' },
-      { id: 'gpt-4o', label: 'GPT-4o Omnimodal' },
-    ],
-  });
-});
-
 // App Health
-app.get('/api/health', async (req, res) => {
-  let omnirouteLive = false;
-  try {
-    const r = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/models`, {
-      headers: {
-        'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
-        'x-omniroute-forwarded': '1',
-      },
-      signal: AbortSignal.timeout(3000),
-    });
-    omnirouteLive = r.ok;
-  } catch {
-    // Ignore timeout
-  }
-
+app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     brand: 'Nexuss AI',
-    gateway: {
-      provider: 'OmniRoute AI Gateway',
-      live: omnirouteLive,
-      baseUrl: OMNIROUTE_BASE_URL,
-    },
     timestamp: new Date().toISOString(),
   });
 });

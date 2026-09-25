@@ -179,7 +179,7 @@ export const UpgradeModal: React.FC<{
 
       <div className="space-y-3 py-2">
         {[
-          'Priority access to Nexuss 3.1 Pro & Gemini 3.8 Flash',
+          'Priority access to Nexuss AI Ultra & Reasoning Engine',
           'Unlimited Deeper Research multi-step synthesis',
           'Live Web Grounding with citation verification',
           '100MB+ document and multi-modal file attachments',
