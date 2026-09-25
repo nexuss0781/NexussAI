@@ -71,9 +71,9 @@ export const TopNav: React.FC<TopNavProps> = ({
         )}
       </div>
 
-      {/* CENTER: Brand Nexuss AI - Vintage Cursive */}
+      {/* CENTER: Brand Nexuss AI - Formal, distinct luxury roman serif (Hunt & Com / Dolores style) */}
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none select-none">
-        <span className="font-['Pinyon_Script',cursive] text-xl sm:text-2xl font-normal tracking-wide text-zinc-100">
+        <span className="font-['Cinzel',serif] font-bold text-[14px] sm:text-[15px] tracking-[0.22em] text-zinc-100 uppercase">
           Nexuss AI
         </span>
       </div>
