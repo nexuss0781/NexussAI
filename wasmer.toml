@@ -1,6 +1,6 @@
 [package]
 name = 'nexuss0781/nexussai'
-version = '0.1.23'
+version = '0.1.25'
 description = 'Nexuss AI autonomous agent with Filesystem Kit integration'
 entrypoint = 'node src/server.cjs'
 private = true

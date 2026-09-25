@@ -8,7 +8,7 @@ env:
   OMNIROUTE_BASE_URL: https://omniouter-vercel.vercel.app
   OMNIROUTE_AI_API_KEY: my-super-secret-gateway-token-123
   NODE_ENV: production
-  STATIC_DIR: /app/dist
+  STATIC_DIR: dist
 annotations:
   anybuild.run/config:
     commands:

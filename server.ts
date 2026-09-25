@@ -1049,6 +1049,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+function findStaticDir(): string {
+  const candidates = [
+    process.env.STATIC_DIR,
+    '/public',
+    path.resolve(process.cwd(), 'dist'),
+    path.resolve(process.cwd(), 'public'),
+    '/app/dist',
+  ].filter(Boolean) as string[];
+
+  for (const cand of candidates) {
+    if (fs.existsSync(cand) && fs.existsSync(path.join(cand, 'index.html'))) {
+      return cand;
+    }
+  }
+  for (const cand of candidates) {
+    if (fs.existsSync(cand)) return cand;
+  }
+  return path.resolve(process.cwd(), 'dist');
+}
+
 // Vite Middleware for Dev vs Production Static Serving
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
@@ -1059,10 +1079,15 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const staticRoot = process.env.STATIC_DIR || path.resolve(process.cwd(), 'dist');
+    const staticRoot = findStaticDir();
     app.use(express.static(staticRoot));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(staticRoot, 'index.html'));
+      const indexPath = path.join(staticRoot, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(200).send('<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Nexuss AI</title></head><body><div id="root"></div></body></html>');
+      }
     });
   }
 

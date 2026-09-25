@@ -25194,6 +25194,24 @@ app.get("/api/health", (req, res) => {
     timestamp: (/* @__PURE__ */ new Date()).toISOString()
   });
 });
+function findStaticDir() {
+  const candidates = [
+    process.env.STATIC_DIR,
+    "/public",
+    import_path.default.resolve(process.cwd(), "dist"),
+    import_path.default.resolve(process.cwd(), "public"),
+    "/app/dist"
+  ].filter(Boolean);
+  for (const cand of candidates) {
+    if (import_fs.default.existsSync(cand) && import_fs.default.existsSync(import_path.default.join(cand, "index.html"))) {
+      return cand;
+    }
+  }
+  for (const cand of candidates) {
+    if (import_fs.default.existsSync(cand)) return cand;
+  }
+  return import_path.default.resolve(process.cwd(), "dist");
+}
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const { createServer } = await import("vite");
@@ -25203,10 +25221,15 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const staticRoot = process.env.STATIC_DIR || import_path.default.resolve(process.cwd(), "dist");
+    const staticRoot = findStaticDir();
     app.use(import_express.default.static(staticRoot));
     app.get("*", (req, res) => {
-      res.sendFile(import_path.default.join(staticRoot, "index.html"));
+      const indexPath = import_path.default.join(staticRoot, "index.html");
+      if (import_fs.default.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(200).send('<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Nexuss AI</title></head><body><div id="root"></div></body></html>');
+      }
     });
   }
   app.listen(PORT, "0.0.0.0", () => {
