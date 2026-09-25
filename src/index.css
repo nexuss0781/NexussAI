@@ -1,9 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Hypik';
+  src: url('/fonts/hypik.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
+}
+
+.font-hypik {
+  font-family: 'Hypik', sans-serif;
 }
 
 .font-serif-luxury {

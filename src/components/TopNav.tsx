@@ -71,9 +71,9 @@ export const TopNav: React.FC<TopNavProps> = ({
         )}
       </div>
 
-      {/* CENTER: Brand Nexuss AI - Distinct professional font */}
+      {/* CENTER: Brand Nexuss AI - Hypik typeface */}
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none select-none">
-        <span className="font-['Space_Grotesk',sans-serif] font-bold text-base sm:text-[17px] tracking-tight text-zinc-100">
+        <span className="font-['Hypik',sans-serif] text-base sm:text-lg tracking-wide text-zinc-100">
           Nexuss AI
         </span>
       </div>
