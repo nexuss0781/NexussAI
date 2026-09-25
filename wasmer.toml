@@ -1,9 +1,14 @@
 [package]
 name = 'nexuss0781/nexussai'
-version = '0.1.22'
+version = '0.1.23'
 description = 'Nexuss AI autonomous agent with Filesystem Kit integration'
 entrypoint = 'node src/server.cjs'
 private = true
 
 [fs]
 '/public' = 'dist'
+
+[env]
+OMNIROUTE_BASE_URL = 'https://omniouter-vercel.vercel.app'
+OMNIROUTE_AI_API_KEY = 'my-super-secret-gateway-token-123'
+FILESYSTEM_KIT_URL = 'https://filesystem-kit.wasmer.app'

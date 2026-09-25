@@ -9,12 +9,15 @@ import {
   ArrowUp, 
   Paperclip, 
   X,
-  FileText
+  FileText,
+  Square,
+  RefreshCw
 } from 'lucide-react';
 
 interface PromptBoxProps {
   onSendMessage: (text: string, options: { deepResearch: boolean; webSearch: boolean; thinking: boolean; attachments: any[] }) => void;
   isLoading: boolean;
+  onAbort?: () => void;
   onOpenSavedPrompts: () => void;
   initialPrompt?: string;
   compactDocked?: boolean;
@@ -23,6 +26,7 @@ interface PromptBoxProps {
 export const PromptBox: React.FC<PromptBoxProps> = ({
   onSendMessage,
   isLoading,
+  onAbort,
   onOpenSavedPrompts,
   initialPrompt = '',
   compactDocked = false,
@@ -234,13 +238,21 @@ export const PromptBox: React.FC<PromptBoxProps> = ({
             </div>
           </div>
 
-          {/* Right Action Button (Mic or Send Arrow) */}
+          {/* Right Action Button (Stop, Send Arrow, or Mic) */}
           <div className="flex items-center shrink-0">
-            {prompt.trim().length > 0 || attachments.length > 0 ? (
+            {isLoading ? (
+              <button
+                type="button"
+                onClick={onAbort}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 flex items-center justify-center shadow-md transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                title="Stop / Abort Generation"
+              >
+                <Square className="w-3 h-3 fill-rose-300 stroke-rose-300" />
+              </button>
+            ) : prompt.trim().length > 0 || attachments.length > 0 ? (
               <button
                 type="button"
                 onClick={() => handleSubmit()}
-                disabled={isLoading}
                 className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center shadow-md shadow-violet-900/30 transition-all cursor-pointer transform hover:scale-105 active:scale-95"
                 title="Send message (Enter)"
               >

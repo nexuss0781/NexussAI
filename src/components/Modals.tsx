@@ -7,7 +7,13 @@ import {
   Compass, 
   ArrowRight,
   Folder,
-  FileText
+  FileText,
+  Trash2,
+  Plus,
+  Copy,
+  Search,
+  GitBranch,
+  Sparkles
 } from 'lucide-react';
 import { SavedPrompt } from '../types';
 import { NexussFace } from './NexussFace';
@@ -55,106 +61,251 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({ title, isOpen, onClose, chi
   );
 };
 
-// 1. Saved Prompts Modal
+// 1. Real Dynamic Saved Prompts Modal
 export const SavedPromptsModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
+  savedPrompts: SavedPrompt[];
   onSelectPrompt: (prompt: string) => void;
-}> = ({ isOpen, onClose, onSelectPrompt }) => {
+  onDeletePrompt: (id: string) => void;
+  onAddPrompt: (title: string, promptText: string, category: string) => void;
+}> = ({ isOpen, onClose, savedPrompts, onSelectPrompt, onDeletePrompt, onAddPrompt }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newPromptText, setNewPromptText] = useState('');
+  const [newCategory, setNewCategory] = useState('Productivity');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const categories = ['All', 'Productivity', 'Strategy', 'Technical', 'Creative'];
+  const categories = ['All', 'Productivity', 'Strategy', 'Technical', 'Creative', 'Custom'];
 
-  const prompts: SavedPrompt[] = [
-    {
-      id: '1',
-      category: 'Productivity',
-      title: '7-Day Sprint Planner',
-      prompt: 'Create a detailed 7-day sprint plan for a cross-functional engineering team, including daily focus, deliverables, and risk mitigation strategies.',
-      iconName: 'Zap',
-    },
-    {
-      id: '2',
-      category: 'Productivity',
-      title: 'Concise Stakeholder Brief',
-      prompt: 'Draft a concise executive email to key stakeholders summarizing this week’s technical milestones, throughput improvements, and upcoming roadmap dependencies.',
-      iconName: 'Mail',
-    },
-    {
-      id: '3',
-      category: 'Strategy',
-      title: 'Eisenhower Prioritization Matrix',
-      prompt: 'Analyze a list of 10 incoming initiatives using the Eisenhower Matrix. Group into Do First, Schedule, Delegate, and Eliminate with rationale.',
-      iconName: 'Layers',
-    },
-    {
-      id: '4',
-      category: 'Strategy',
-      title: 'GDPR vs CCPA Audit',
-      prompt: 'Compare key differences between GDPR and CCPA regarding data collection consent, erasure timelines, territorial scope, and non-compliance fines in a structured table.',
-      iconName: 'Shield',
-    },
-    {
-      id: '5',
-      category: 'Creative',
-      title: 'Brand Positioning & Taglines',
-      prompt: 'Generate 5 high-impact, distinctive taglines for an eco-conscious sustainable luxury brand, complete with demographic hooks and messaging rationale.',
-      iconName: 'Sparkles',
-    },
-    {
-      id: '6',
-      category: 'Technical',
-      title: 'Architectural Code Review',
-      prompt: 'Review this architecture pattern for potential bottlenecks, race conditions, memory leaks, and horizontal scaling constraints.',
-      iconName: 'Code',
-    },
-  ];
+  const handleCopy = (id: string, text: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
-  const filtered = selectedCategory === 'All' 
-    ? prompts 
-    : prompts.filter(p => p.category === selectedCategory);
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPromptText.trim()) return;
+    const title = newTitle.trim() || newPromptText.slice(0, 30) + '...';
+    onAddPrompt(title, newPromptText.trim(), newCategory);
+    setNewTitle('');
+    setNewPromptText('');
+    setIsAdding(false);
+  };
+
+  const filtered = savedPrompts.filter(p => {
+    const matchesCat = selectedCategory === 'All' || p.category === selectedCategory || (selectedCategory === 'Custom' && p.isCustom);
+    const matchesSearch = !searchQuery.trim() || 
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      p.prompt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
 
   return (
     <ModalWrapper title="Saved Prompts Library" isOpen={isOpen} onClose={onClose} icon={<Bookmark className="w-4 h-4" />}>
-      <div className="flex gap-1.5 overflow-x-auto pb-2 border-b border-zinc-800">
-        {categories.map(cat => (
+      {/* Search & Add New Header */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search saved prompts..."
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+            />
+          </div>
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-              selectedCategory === cat
-                ? 'bg-violet-600 text-white shadow-xs'
-                : 'bg-zinc-800/60 text-zinc-400 hover:text-zinc-200'
-            }`}
+            onClick={() => setIsAdding(!isAdding)}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/40 text-violet-300 text-xs font-medium transition-colors cursor-pointer shrink-0"
           >
-            {cat}
+            <Plus className="w-3.5 h-3.5" />
+            <span>{isAdding ? 'Cancel' : 'New Prompt'}</span>
           </button>
-        ))}
+        </div>
+
+        {/* Add New Custom Prompt Form */}
+        {isAdding && (
+          <form onSubmit={handleCreate} className="p-3.5 rounded-xl bg-zinc-900/90 border border-violet-500/40 space-y-2.5 animate-in fade-in duration-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-violet-300">Create Saved Prompt</span>
+              <select
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 text-zinc-300 text-[11px] rounded-lg px-2 py-0.5 focus:outline-none"
+              >
+                <option value="Productivity">Productivity</option>
+                <option value="Strategy">Strategy</option>
+                <option value="Technical">Technical</option>
+                <option value="Creative">Creative</option>
+              </select>
+            </div>
+            <input
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Prompt Title (optional)"
+              className="w-full bg-zinc-800/80 border border-zinc-700 rounded-lg px-2.5 py-1 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-violet-400"
+            />
+            <textarea
+              value={newPromptText}
+              onChange={(e) => setNewPromptText(e.target.value)}
+              placeholder="Enter your prompt content..."
+              className="w-full bg-zinc-800/80 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-violet-400 min-h-[70px] resize-none"
+              required
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsAdding(false)}
+                className="px-2.5 py-1 rounded-lg text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!newPromptText.trim()}
+                className="px-3 py-1 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-40"
+              >
+                Save Prompt
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Category Pills */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 border-b border-zinc-800">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                selectedCategory === cat
+                  ? 'bg-violet-600 text-white shadow-xs'
+                  : 'bg-zinc-800/60 text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-2.5 pt-2">
-        {filtered.map(p => (
-          <div
-            key={p.id}
-            onClick={() => {
-              onSelectPrompt(p.prompt);
-              onClose();
-            }}
-            className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-850 border border-zinc-800 hover:border-violet-500/40 transition-all cursor-pointer group text-left"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-semibold text-zinc-100 group-hover:text-violet-200 transition-colors">
-                {p.title}
-              </span>
-              <span className="text-[10px] text-violet-400/80 uppercase tracking-wider font-mono">
-                {p.category}
-              </span>
-            </div>
-            <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
-              {p.prompt}
+      {/* Prompts List */}
+      <div className="space-y-2.5 pt-1">
+        {filtered.length === 0 ? (
+          <div className="text-center py-8 text-zinc-500 text-xs">
+            No saved prompts found in this category. Click "New Prompt" or bookmark any message in chat to save.
+          </div>
+        ) : (
+          filtered.map(p => {
+            const isCopied = copiedId === p.id;
+            return (
+              <div
+                key={p.id}
+                onClick={() => {
+                  onSelectPrompt(p.prompt);
+                  onClose();
+                }}
+                className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-850 border border-zinc-800 hover:border-violet-500/40 transition-all cursor-pointer group text-left relative"
+              >
+                <div className="flex items-center justify-between mb-1 pr-16">
+                  <span className="text-xs font-semibold text-zinc-100 group-hover:text-violet-200 transition-colors truncate">
+                    {p.title}
+                  </span>
+                  <span className="text-[10px] text-violet-400/80 uppercase tracking-wider font-mono shrink-0 ml-2">
+                    {p.category}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                  {p.prompt}
+                </p>
+
+                {/* Actions overlay on item */}
+                <div className="absolute right-3 top-3 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => handleCopy(p.id, p.prompt, e)}
+                    className="p-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs transition-colors cursor-pointer"
+                    title="Copy prompt text"
+                  >
+                    {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeletePrompt(p.id);
+                    }}
+                    className="p-1 rounded-md bg-zinc-800 hover:bg-rose-500/20 hover:text-rose-400 text-zinc-400 text-xs transition-colors cursor-pointer"
+                    title="Delete saved prompt"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </ModalWrapper>
+  );
+};
+
+// 2. Branch Confirmation Modal
+export const BranchConfirmModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  messageSnippet?: string;
+  sourceThreadTitle?: string;
+}> = ({ isOpen, onClose, onConfirm, messageSnippet, sourceThreadTitle }) => {
+  if (!isOpen) return null;
+
+  return (
+    <ModalWrapper title="Branch into New Chat" isOpen={isOpen} onClose={onClose} icon={<GitBranch className="w-4 h-4" />}>
+      <div className="space-y-4 py-1">
+        <p className="text-xs text-zinc-300 leading-relaxed">
+          Create an independent conversation thread containing the entire message history up to this response. You can explore new ideas without changing the current chat.
+        </p>
+
+        {sourceThreadTitle && (
+          <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs space-y-1">
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">Source Thread</span>
+            <div className="text-zinc-200 font-medium truncate">{sourceThreadTitle}</div>
+          </div>
+        )}
+
+        {messageSnippet && (
+          <div className="p-3 rounded-xl bg-[#1c1929] border border-violet-500/30 text-xs space-y-1">
+            <span className="text-[10px] text-violet-400 uppercase tracking-wider font-mono">Branch Point Message</span>
+            <p className="text-zinc-300 line-clamp-3 italic">
+              "{messageSnippet}"
             </p>
           </div>
-        ))}
+        )}
+
+        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-zinc-800/80">
+          <button
+            onClick={onClose}
+            className="px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-all shadow-md shadow-violet-600/20 cursor-pointer"
+          >
+            <GitBranch className="w-3.5 h-3.5" />
+            <span>Confirm & Create Branch</span>
+          </button>
+        </div>
       </div>
     </ModalWrapper>
   );

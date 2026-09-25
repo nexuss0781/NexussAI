@@ -10,6 +10,11 @@ export interface ChatMessage {
   attachments?: { name: string; size: string; type: string }[];
   sources?: { title: string; url: string; snippet: string }[];
   isThinking?: boolean;
+  
+  // Versioning system for edited user prompts
+  versions?: string[];
+  versionIndex?: number;
+  versionBranches?: Record<number, ChatMessage[]>; // downstream messages per version
 }
 
 export interface ChatThread {
@@ -26,5 +31,8 @@ export interface SavedPrompt {
   category: string;
   title: string;
   prompt: string;
-  iconName: string;
+  iconName?: string;
+  createdAt?: string;
+  isCustom?: boolean;
 }
+

@@ -11,6 +11,10 @@ var __commonJS = (cb, mod) => function __require() {
     throw mod = 0, e;
   }
 };
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -27,6 +31,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // node_modules/depd/index.js
 var require_depd = __commonJS({
@@ -1288,8 +1293,8 @@ var require_node = __commonJS({
           }
           break;
         case "FILE":
-          var fs = require("fs");
-          stream2 = new fs.SyncWriteStream(fd2, { autoClose: false });
+          var fs2 = require("fs");
+          stream2 = new fs2.SyncWriteStream(fd2, { autoClose: false });
           stream2._type = "fs";
           break;
         case "PIPE":
@@ -17733,8 +17738,8 @@ var require_node2 = __commonJS({
           }
           break;
         case "FILE":
-          var fs = require("fs");
-          stream2 = new fs.SyncWriteStream(fd2, { autoClose: false });
+          var fs2 = require("fs");
+          stream2 = new fs2.SyncWriteStream(fd2, { autoClose: false });
           stream2._type = "fs";
           break;
         case "PIPE":
@@ -18452,8 +18457,8 @@ var require_node3 = __commonJS({
           }
           break;
         case "FILE":
-          var fs = require("fs");
-          stream2 = new fs.SyncWriteStream(fd2, { autoClose: false });
+          var fs2 = require("fs");
+          stream2 = new fs2.SyncWriteStream(fd2, { autoClose: false });
           stream2._type = "fs";
           break;
         case "PIPE":
@@ -19347,7 +19352,7 @@ var require_view = __commonJS({
     "use strict";
     var debug = require_src3()("express:view");
     var path2 = require("path");
-    var fs = require("fs");
+    var fs2 = require("fs");
     var dirname = path2.dirname;
     var basename = path2.basename;
     var extname = path2.extname;
@@ -19413,7 +19418,7 @@ var require_view = __commonJS({
     function tryStat(path3) {
       debug('stat "%s"', path3);
       try {
-        return fs.statSync(path3);
+        return fs2.statSync(path3);
       } catch (e) {
         return void 0;
       }
@@ -20018,8 +20023,8 @@ var require_node4 = __commonJS({
           }
           break;
         case "FILE":
-          var fs = require("fs");
-          stream2 = new fs.SyncWriteStream(fd2, { autoClose: false });
+          var fs2 = require("fs");
+          stream2 = new fs2.SyncWriteStream(fd2, { autoClose: false });
           stream2._type = "fs";
           break;
         case "PIPE":
@@ -20192,7 +20197,7 @@ var require_types = __commonJS({
 var require_mime = __commonJS({
   "node_modules/mime/mime.js"(exports2, module2) {
     var path2 = require("path");
-    var fs = require("fs");
+    var fs2 = require("fs");
     function Mime() {
       this.types = /* @__PURE__ */ Object.create(null);
       this.extensions = /* @__PURE__ */ Object.create(null);
@@ -20213,7 +20218,7 @@ var require_mime = __commonJS({
     };
     Mime.prototype.load = function(file) {
       this._loading = file;
-      var map = {}, content = fs.readFileSync(file, "ascii"), lines = content.split(/[\r\n]+/);
+      var map = {}, content = fs2.readFileSync(file, "ascii"), lines = content.split(/[\r\n]+/);
       lines.forEach(function(line) {
         var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
         map[fields.shift()] = fields;
@@ -20451,7 +20456,7 @@ var require_send = __commonJS({
     var escapeHtml = require_escape_html();
     var etag = require_etag();
     var fresh = require_fresh();
-    var fs = require("fs");
+    var fs2 = require("fs");
     var mime = require_mime();
     var ms = require_ms5();
     var onFinished = require_on_finished();
@@ -20784,7 +20789,7 @@ var require_send = __commonJS({
       var i = 0;
       var self = this;
       debug('stat "%s"', path3);
-      fs.stat(path3, function onstat(err, stat) {
+      fs2.stat(path3, function onstat(err, stat) {
         if (err && err.code === "ENOENT" && !extname(path3) && path3[path3.length - 1] !== sep) {
           return next(err);
         }
@@ -20799,7 +20804,7 @@ var require_send = __commonJS({
         }
         var p = path3 + "." + self._extensions[i++];
         debug('stat "%s"', p);
-        fs.stat(p, function(err2, stat) {
+        fs2.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -20817,7 +20822,7 @@ var require_send = __commonJS({
         }
         var p = join(path3, self._index[i]);
         debug('stat "%s"', p);
-        fs.stat(p, function(err2, stat) {
+        fs2.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -20829,7 +20834,7 @@ var require_send = __commonJS({
     SendStream.prototype.stream = function stream(path3, options) {
       var self = this;
       var res = this.res;
-      var stream2 = fs.createReadStream(path3, options);
+      var stream2 = fs2.createReadStream(path3, options);
       this.emit("stream", stream2);
       stream2.pipe(res);
       function cleanup() {
@@ -23971,7 +23976,7 @@ var require_express2 = __commonJS({
 // node_modules/dotenv/lib/main.js
 var require_main = __commonJS({
   "node_modules/dotenv/lib/main.js"(exports2, module2) {
-    var fs = require("fs");
+    var fs2 = require("fs");
     var path2 = require("path");
     var os = require("os");
     var crypto = require("crypto");
@@ -24103,7 +24108,7 @@ var require_main = __commonJS({
       if (options && options.path && options.path.length > 0) {
         if (Array.isArray(options.path)) {
           for (const filepath of options.path) {
-            if (fs.existsSync(filepath)) {
+            if (fs2.existsSync(filepath)) {
               possibleVaultPath = filepath.endsWith(".vault") ? filepath : `${filepath}.vault`;
             }
           }
@@ -24113,7 +24118,7 @@ var require_main = __commonJS({
       } else {
         possibleVaultPath = path2.resolve(process.cwd(), ".env.vault");
       }
-      if (fs.existsSync(possibleVaultPath)) {
+      if (fs2.existsSync(possibleVaultPath)) {
         return possibleVaultPath;
       }
       return null;
@@ -24166,7 +24171,7 @@ var require_main = __commonJS({
       const parsedAll = {};
       for (const path3 of optionPaths) {
         try {
-          const parsed = DotenvModule.parse(fs.readFileSync(path3, { encoding }));
+          const parsed = DotenvModule.parse(fs2.readFileSync(path3, { encoding }));
           DotenvModule.populate(parsedAll, parsed, options);
         } catch (e) {
           if (debug) {
@@ -24288,254 +24293,748 @@ var require_main = __commonJS({
 });
 
 // server.ts
+var server_exports = {};
+__export(server_exports, {
+  NEXUSS_TOOL_REGISTRY: () => NEXUSS_TOOL_REGISTRY
+});
+module.exports = __toCommonJS(server_exports);
 var import_express = __toESM(require_express2(), 1);
 var import_dotenv = __toESM(require_main(), 1);
 var import_path = __toESM(require("path"), 1);
+var import_fs = __toESM(require("fs"), 1);
 import_dotenv.default.config();
 var app = (0, import_express.default)();
 var PORT = Number(process.env.PORT) || 3e3;
 app.use(import_express.default.json({ limit: "10mb" }));
 var OMNIROUTE_BASE_URL = (process.env.OMNIROUTE_BASE_URL || "https://omniouter-vercel.vercel.app").replace(/\/+$/, "");
 var OMNIROUTE_AI_API_KEY = (process.env.OMNIROUTE_AI_API_KEY || "my-super-secret-gateway-token-123").trim();
-var FILESYSTEM_KIT_URL = (process.env.FILESYSTEM_KIT_URL || "https://filesystem-kit.wasmer.app").replace(/\/$/, "");
-var filesystemToolDeclarations = [
-  { name: "read_file", description: "Read a text file from the connected workspace. Use this before editing.", parametersJsonSchema: { type: "object", properties: { path: { type: "string" }, head: { type: "integer" }, tail: { type: "integer" }, start: { type: "integer" }, end: { type: "integer" } }, required: ["path"] } },
-  { name: "write_file", description: "Create or replace a text file in the connected workspace.", parametersJsonSchema: { type: "object", properties: { path: { type: "string" }, content: { type: "string" }, append: { type: "boolean" }, range: { type: "object", properties: { start: { type: "integer" }, end: { type: "integer" } }, required: ["start", "end"] } }, required: ["path", "content"] } },
-  { name: "modify_file", description: "Replace one exact occurrence or rewrite a selected line range.", parametersJsonSchema: { type: "object", properties: { path: { type: "string" }, match: { type: "string" }, replacement: { type: "string" }, occurrence: { type: "integer" }, rewrite: { type: "string" }, range: { type: "object", properties: { start: { type: "integer" }, end: { type: "integer" } }, required: ["start", "end"] } }, required: ["path"] } },
-  { name: "list_files", description: "List immediate files and directories inside a workspace directory.", parametersJsonSchema: { type: "object", properties: { path: { type: "string" }, all: { type: "boolean" } } } },
-  { name: "glob_files", description: "Find workspace paths matching a glob pattern.", parametersJsonSchema: { type: "object", properties: { pattern: { type: "string" }, cwd: { type: "string" }, all: { type: "boolean" } }, required: ["pattern"] } },
-  { name: "grep_files", description: "Search text lines in a workspace file or directory.", parametersJsonSchema: { type: "object", properties: { pattern: { type: "string" }, path: { type: "string" }, ignoreCase: { type: "boolean" }, all: { type: "boolean" } }, required: ["pattern"] } },
-  { name: "delete_file", description: "Delete a workspace file or directory. Only use when explicitly requested.", parametersJsonSchema: { type: "object", properties: { path: { type: "string" }, recursive: { type: "boolean" }, force: { type: "boolean" } }, required: ["path"] } }
-];
-var openAiTools = filesystemToolDeclarations.map((tool) => ({
-  type: "function",
-  function: {
-    name: tool.name,
-    description: tool.description,
-    parameters: tool.parametersJsonSchema
+var FILESYSTEM_KIT_URL = (process.env.FILESYSTEM_KIT_URL || "https://filesystem-kit.wasmer.app").replace(/\/+$/, "");
+function getWorkspaceRoot() {
+  if (process.env.WORKSPACE_ROOT && import_fs.default.existsSync(process.env.WORKSPACE_ROOT)) {
+    return import_path.default.resolve(process.env.WORKSPACE_ROOT);
   }
-}));
-async function callFilesystemKit(name, args) {
-  const request = async (endpoint, init) => {
-    const response = await fetch(`${FILESYSTEM_KIT_URL}${endpoint}`, { ...init, headers: { "Content-Type": "application/json", ...init?.headers || {} } });
-    const body = await response.text();
-    if (!response.ok) throw new Error(`Filesystem Kit ${response.status}: ${body.slice(0, 500)}`);
-    return (response.headers.get("content-type") || "").includes("application/json") ? JSON.parse(body) : body;
+  if (process.env.FILESYSTEM_ROOT && import_fs.default.existsSync(process.env.FILESYSTEM_ROOT)) {
+    return import_path.default.resolve(process.env.FILESYSTEM_ROOT);
+  }
+  return import_path.default.resolve(process.cwd());
+}
+function resolveSafePath(userPath = ".") {
+  const root = getWorkspaceRoot();
+  let clean = (userPath || ".").trim();
+  clean = clean.replace(/^\/home\/ubuntu(\/|$)/, "./");
+  clean = clean.replace(/^\/data(\/|$)/, "./");
+  clean = clean.replace(/^\/app\/applet(\/|$)/, "./");
+  const normalized = import_path.default.normalize(clean.replace(/^[/\\]+/, ""));
+  const target = import_path.default.resolve(root, normalized || ".");
+  if (!target.startsWith(root)) {
+    return root;
+  }
+  return target;
+}
+function getRelativeWorkspacePath(absPath) {
+  const root = getWorkspaceRoot();
+  const rel = import_path.default.relative(root, absPath);
+  return rel ? rel.replace(/\\/g, "/") : ".";
+}
+function localListFiles(args) {
+  const target = resolveSafePath(args.path || ".");
+  if (!import_fs.default.existsSync(target)) {
+    throw new Error(`Directory does not exist: ${args.path || "."}`);
+  }
+  const stat = import_fs.default.statSync(target);
+  if (!stat.isDirectory()) {
+    return {
+      path: getRelativeWorkspacePath(target),
+      type: "file",
+      size: stat.size
+    };
+  }
+  const entries = import_fs.default.readdirSync(target, { withFileTypes: true });
+  const showAll = Boolean(args.all);
+  const results = entries.filter((e) => showAll || !e.name.startsWith(".")).map((e) => ({
+    name: e.name,
+    path: getRelativeWorkspacePath(import_path.default.join(target, e.name)),
+    isDirectory: e.isDirectory(),
+    size: e.isFile() ? import_fs.default.statSync(import_path.default.join(target, e.name)).size : void 0,
+    modifiedAt: import_fs.default.statSync(import_path.default.join(target, e.name)).mtime.toISOString()
+  }));
+  return {
+    path: getRelativeWorkspacePath(target),
+    entries: results,
+    count: results.length
   };
-  const query = (values) => new URLSearchParams(Object.entries(values).filter(([, value]) => value !== void 0 && value !== null).map(([key, value]) => [key, String(value)])).toString();
+}
+function localReadFile(args) {
+  if (!args.path) throw new Error('Missing "path" parameter');
+  const target = resolveSafePath(args.path);
+  if (!import_fs.default.existsSync(target)) {
+    throw new Error(`File not found: ${args.path}`);
+  }
+  const stat = import_fs.default.statSync(target);
+  if (stat.isDirectory()) {
+    throw new Error(`Target is a directory, not a file: ${args.path}`);
+  }
+  const raw = import_fs.default.readFileSync(target, "utf-8");
+  const lines = raw.split(/\r?\n/);
+  const totalLines = lines.length;
+  const startLine = args.range?.start ?? args.start;
+  const endLine = args.range?.end ?? args.end;
+  let sliced = lines;
+  if (startLine !== void 0 || endLine !== void 0) {
+    const s = Math.max(1, Number(startLine) || 1) - 1;
+    const e = endLine !== void 0 ? Math.min(totalLines, Number(endLine)) : totalLines;
+    sliced = lines.slice(s, e);
+  } else if (args.head !== void 0) {
+    sliced = lines.slice(0, Math.max(1, Number(args.head)));
+  } else if (args.tail !== void 0) {
+    sliced = lines.slice(-Math.max(1, Number(args.tail)));
+  }
+  return {
+    path: getRelativeWorkspacePath(target),
+    content: sliced.join("\n"),
+    totalLines,
+    bytes: stat.size
+  };
+}
+function localWriteFile(args) {
+  if (!args.path) throw new Error('Missing "path" parameter');
+  const target = resolveSafePath(args.path);
+  const dir = import_path.default.dirname(target);
+  if (!import_fs.default.existsSync(dir)) {
+    import_fs.default.mkdirSync(dir, { recursive: true });
+  }
+  if (args.range && import_fs.default.existsSync(target)) {
+    const raw = import_fs.default.readFileSync(target, "utf-8");
+    const lines = raw.split(/\r?\n/);
+    const s = Math.max(1, Number(args.range.start) || 1) - 1;
+    const e = Math.min(lines.length, Number(args.range.end) || lines.length);
+    const newLines = (args.content ?? "").split(/\r?\n/);
+    lines.splice(s, e - s, ...newLines);
+    import_fs.default.writeFileSync(target, lines.join("\n"), "utf-8");
+    return {
+      success: true,
+      path: getRelativeWorkspacePath(target),
+      linesModified: e - s
+    };
+  }
+  const content = args.content ?? "";
+  if (args.append && import_fs.default.existsSync(target)) {
+    import_fs.default.appendFileSync(target, content, "utf-8");
+  } else {
+    import_fs.default.writeFileSync(target, content, "utf-8");
+  }
+  return {
+    success: true,
+    path: getRelativeWorkspacePath(target),
+    bytesWritten: Buffer.byteLength(content)
+  };
+}
+function localModifyFile(args) {
+  if (!args.path) throw new Error('Missing "path" parameter');
+  const target = resolveSafePath(args.path);
+  if (!import_fs.default.existsSync(target)) {
+    throw new Error(`File not found: ${args.path}`);
+  }
+  if (args.rewrite !== void 0 && args.range) {
+    const raw = import_fs.default.readFileSync(target, "utf-8");
+    const lines = raw.split(/\r?\n/);
+    const s = Math.max(1, Number(args.range.start) || 1) - 1;
+    const e = Math.min(lines.length, Number(args.range.end) || lines.length);
+    const newLines = (args.rewrite ?? "").split(/\r?\n/);
+    lines.splice(s, e - s, ...newLines);
+    import_fs.default.writeFileSync(target, lines.join("\n"), "utf-8");
+    return {
+      success: true,
+      path: getRelativeWorkspacePath(target),
+      rewriteApplied: true
+    };
+  }
+  let content = import_fs.default.readFileSync(target, "utf-8");
+  let changesMade = 0;
+  if (args.edits && Array.isArray(args.edits)) {
+    for (const edit of args.edits) {
+      if (edit.find && content.includes(edit.find)) {
+        content = content.replace(edit.find, edit.replace ?? "");
+        changesMade += 1;
+      }
+    }
+  } else {
+    const findStr = args.match ?? args.old_str ?? args.find;
+    const replaceStr = args.replacement ?? args.new_str ?? args.replace ?? "";
+    if (findStr) {
+      if (!content.includes(findStr)) {
+        throw new Error(`Target search string not found in ${args.path}`);
+      }
+      if (args.occurrence && Number(args.occurrence) > 1) {
+        let count = 0;
+        let pos = 0;
+        let replaced = false;
+        while ((pos = content.indexOf(findStr, pos)) !== -1) {
+          count++;
+          if (count === Number(args.occurrence)) {
+            content = content.slice(0, pos) + replaceStr + content.slice(pos + findStr.length);
+            replaced = true;
+            changesMade = 1;
+            break;
+          }
+          pos += findStr.length;
+        }
+        if (!replaced) {
+          throw new Error(`Occurrence ${args.occurrence} of target string not found in ${args.path}`);
+        }
+      } else {
+        content = content.replace(findStr, replaceStr);
+        changesMade += 1;
+      }
+    }
+  }
+  import_fs.default.writeFileSync(target, content, "utf-8");
+  return {
+    success: true,
+    path: getRelativeWorkspacePath(target),
+    changesApplied: changesMade
+  };
+}
+function localGlobFiles(args) {
+  const root = resolveSafePath(args.cwd || args.path || ".");
+  const pattern = (args.pattern || "*").trim();
+  const matched = [];
+  const globRegex = new RegExp("^" + pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*").replace(/\?/g, ".") + "$");
+  const walk = (dir) => {
+    if (!import_fs.default.existsSync(dir)) return;
+    const entries = import_fs.default.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name === "node_modules" || entry.name === ".git" || entry.name === "dist") continue;
+      const full = import_path.default.join(dir, entry.name);
+      const rel = getRelativeWorkspacePath(full);
+      if (globRegex.test(entry.name) || globRegex.test(rel)) {
+        matched.push(rel);
+      }
+      if (entry.isDirectory()) {
+        walk(full);
+      }
+    }
+  };
+  walk(root);
+  return {
+    pattern,
+    matches: matched,
+    count: matched.length
+  };
+}
+function localGrepFiles(args) {
+  if (!args.pattern) throw new Error('Missing "pattern" parameter');
+  const root = resolveSafePath(args.path || ".");
+  if (!import_fs.default.existsSync(root)) {
+    throw new Error(`File or directory not found: ${args.path || "."}`);
+  }
+  const flags = args.ignoreCase !== false ? "i" : "";
+  const regex = new RegExp(args.pattern, flags);
+  const results = [];
+  const stat = import_fs.default.statSync(root);
+  if (stat.isFile()) {
+    try {
+      const content = import_fs.default.readFileSync(root, "utf-8");
+      const lines = content.split(/\r?\n/);
+      lines.forEach((lineText, idx) => {
+        if (regex.test(lineText)) {
+          results.push({
+            file: getRelativeWorkspacePath(root),
+            line: idx + 1,
+            text: lineText.trim()
+          });
+        }
+      });
+    } catch {
+    }
+    return {
+      pattern: args.pattern,
+      matches: results,
+      totalMatches: results.length
+    };
+  }
+  const walk = (dir) => {
+    if (!import_fs.default.existsSync(dir)) return;
+    const entries = import_fs.default.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name === "node_modules" || entry.name === ".git" || entry.name === "dist") continue;
+      const full = import_path.default.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (entry.isFile()) {
+        try {
+          const content = import_fs.default.readFileSync(full, "utf-8");
+          const lines = content.split(/\r?\n/);
+          lines.forEach((lineText, idx) => {
+            if (regex.test(lineText)) {
+              results.push({
+                file: getRelativeWorkspacePath(full),
+                line: idx + 1,
+                text: lineText.trim()
+              });
+            }
+          });
+        } catch {
+        }
+      }
+    }
+  };
+  walk(root);
+  return {
+    pattern: args.pattern,
+    matches: results.slice(0, 100),
+    totalMatches: results.length
+  };
+}
+function localDeleteFile(args) {
+  if (!args.path) throw new Error('Missing "path" parameter');
+  const target = resolveSafePath(args.path);
+  if (!import_fs.default.existsSync(target)) {
+    throw new Error(`File or directory not found: ${args.path}`);
+  }
+  const stat = import_fs.default.statSync(target);
+  if (stat.isDirectory()) {
+    import_fs.default.rmSync(target, { recursive: Boolean(args.recursive), force: true });
+  } else {
+    import_fs.default.unlinkSync(target);
+  }
+  return {
+    success: true,
+    path: getRelativeWorkspacePath(target)
+  };
+}
+function normalizePathForFilesystemKit(rawPath) {
+  if (!rawPath || rawPath === "." || rawPath === "./") return ".";
+  const trimmed = rawPath.trim();
+  if (trimmed.startsWith("/app/applet/")) {
+    const rel = trimmed.slice("/app/applet/".length);
+    return rel ? `/home/ubuntu/${rel}` : "/home/ubuntu";
+  }
+  if (trimmed === "/app/applet") {
+    return "/home/ubuntu";
+  }
+  if (trimmed.startsWith("/data/")) {
+    const rel = trimmed.slice("/data/".length);
+    return rel ? `/home/ubuntu/${rel}` : "/home/ubuntu";
+  }
+  if (trimmed === "/data") {
+    return "/home/ubuntu";
+  }
+  if (trimmed.startsWith("/home/ubuntu")) {
+    return trimmed;
+  }
+  if (trimmed.startsWith("/")) {
+    return `/home/ubuntu${trimmed}`;
+  }
+  return trimmed;
+}
+async function callFilesystemKit(name, args) {
+  if (FILESYSTEM_KIT_URL) {
+    const sanitizedArgs = { ...args };
+    if (sanitizedArgs.path !== void 0) {
+      sanitizedArgs.path = normalizePathForFilesystemKit(sanitizedArgs.path);
+    }
+    if (sanitizedArgs.cwd !== void 0) {
+      sanitizedArgs.cwd = normalizePathForFilesystemKit(sanitizedArgs.cwd);
+    }
+    const request = async (endpoint, init) => {
+      const response = await fetch(`${FILESYSTEM_KIT_URL}${endpoint}`, {
+        ...init,
+        headers: { "Content-Type": "application/json", ...init?.headers || {} }
+      });
+      const body = await response.text();
+      if (!response.ok) {
+        try {
+          const parsed = JSON.parse(body);
+          throw new Error(parsed.message || parsed.error || `Filesystem Kit error (${response.status})`);
+        } catch (e) {
+          if (e.message && !e.message.startsWith("Unexpected")) throw e;
+          throw new Error(`Filesystem Kit ${response.status}: ${body.slice(0, 500)}`);
+        }
+      }
+      return (response.headers.get("content-type") || "").includes("application/json") ? JSON.parse(body) : body;
+    };
+    const query = (values) => new URLSearchParams(
+      Object.entries(values).filter(([, value]) => value !== void 0 && value !== null).map(([key, value]) => [key, String(value)])
+    ).toString();
+    switch (name) {
+      case "read_file":
+        return await request(`/api/read?${query(sanitizedArgs)}`);
+      case "write_file":
+        return await request("/api/write", { method: "PUT", body: JSON.stringify(sanitizedArgs) });
+      case "modify_file":
+        return await request("/api/modify", { method: "PATCH", body: JSON.stringify(sanitizedArgs) });
+      case "list_files":
+        return await request(`/api/list?${query({ path: sanitizedArgs.path || ".", all: sanitizedArgs.all })}`);
+      case "glob_files":
+        return await request(`/api/glob?${query(sanitizedArgs)}`);
+      case "grep_files":
+        return await request(`/api/grep?${query({ pattern: sanitizedArgs.pattern, path: sanitizedArgs.path || ".", ignoreCase: sanitizedArgs.ignoreCase, all: sanitizedArgs.all })}`);
+      case "delete_file":
+        return await request(`/api/delete?${query(sanitizedArgs)}`, { method: "DELETE" });
+      default:
+        throw new Error(`Unknown filesystem tool: ${name}`);
+    }
+  }
   switch (name) {
     case "read_file":
-      return request(`/api/read?${query(args)}`);
+      return localReadFile(args);
     case "write_file":
-      return request("/api/write", { method: "PUT", body: JSON.stringify(args) });
+      return localWriteFile(args);
     case "modify_file":
-      return request("/api/modify", { method: "PATCH", body: JSON.stringify(args) });
+      return localModifyFile(args);
     case "list_files":
-      return request(`/api/list?${query({ path: args.path || ".", all: args.all })}`);
+      return localListFiles(args);
     case "glob_files":
-      return request(`/api/glob?${query(args)}`);
+      return localGlobFiles(args);
     case "grep_files":
-      return request(`/api/grep?${query({ pattern: args.pattern, path: args.path || ".", ignoreCase: args.ignoreCase, all: args.all })}`);
+      return localGrepFiles(args);
     case "delete_file":
-      return request(`/api/delete?${query(args)}`, { method: "DELETE" });
+      return localDeleteFile(args);
     default:
       throw new Error(`Unknown filesystem tool: ${name}`);
   }
 }
+var NEXUSS_TOOL_REGISTRY = [
+  {
+    name: "read_file",
+    description: "Read contents of a text file from the workspace.",
+    parameters: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: 'Relative path to file (e.g. "src/App.tsx")' },
+        head: { type: "integer", description: "Limit to first N lines" },
+        tail: { type: "integer", description: "Limit to last N lines" },
+        start: { type: "integer", description: "Starting line number (1-based)" },
+        end: { type: "integer", description: "Ending line number" }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "write_file",
+    description: "Create or replace a text file in the workspace.",
+    parameters: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: "Relative path to file" },
+        content: { type: "string", description: "Exact file text content" },
+        append: { type: "boolean", description: "Set true to append content" }
+      },
+      required: ["path", "content"]
+    }
+  },
+  {
+    name: "modify_file",
+    description: "Replace an exact match string or rewrite a section in a file.",
+    parameters: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: "Relative path to file" },
+        match: { type: "string", description: "Exact target string to replace" },
+        replacement: { type: "string", description: "Replacement string" }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "list_files",
+    description: "List immediate files and subdirectories in a folder.",
+    parameters: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: 'Folder path (default: ".")' },
+        all: { type: "boolean", description: "Include hidden files" }
+      }
+    }
+  },
+  {
+    name: "glob_files",
+    description: 'Find workspace files matching a glob pattern (e.g. "**/*.tsx", "src/components/*").',
+    parameters: {
+      type: "object",
+      properties: {
+        pattern: { type: "string", description: "Glob search pattern" },
+        cwd: { type: "string", description: "Base directory" }
+      },
+      required: ["pattern"]
+    }
+  },
+  {
+    name: "grep_files",
+    description: "Search workspace files for matching text lines or regex.",
+    parameters: {
+      type: "object",
+      properties: {
+        pattern: { type: "string", description: "Search term or regex pattern" },
+        path: { type: "string", description: "File or directory path" },
+        ignoreCase: { type: "boolean", description: "Case-insensitive search" }
+      },
+      required: ["pattern"]
+    }
+  },
+  {
+    name: "delete_file",
+    description: "Delete a workspace file or directory (use only when explicitly requested).",
+    parameters: {
+      type: "object",
+      properties: {
+        path: { type: "string", description: "Path to delete" },
+        recursive: { type: "boolean", description: "Recursive delete for directories" }
+      },
+      required: ["path"]
+    }
+  }
+];
+var NEXUSS_TOOL_PROTOCOL_SPEC = `
+# NEXUSS PERSISTENT COMPUTER & TOOL CALLING PROTOCOL (NTCP v1.0)
+You are Nexuss AI operating on your dedicated persistent computer.
+Your filesystem is centralized and persistent across sessions via the external Nexuss FileSystem Kit.
+- Persistent Root Directory: \`/home/ubuntu\`
+- Your computer's working environment and persistent storage are rooted at \`/home/ubuntu\`.
+- All your created files, notes, project files, and workspaces reside under \`/home/ubuntu\`.
+- You can refer to paths relative to your home (e.g. \`notes.txt\`, \`src/index.js\`) or as \`/home/ubuntu/...\`.
+- For centralized data integrity and system security, operations outside \`/home/ubuntu\` are strictly rejected.
+
+## Available Nexuss Tools:
+${JSON.stringify(NEXUSS_TOOL_REGISTRY, null, 2)}
+
+## Nexuss Tool Call Schema:
+To invoke a tool, output a strictly formatted Nexuss Tool Block:
+<nexuss_tool_call>
+{
+  "tool": "<tool_name>",
+  "parameters": {
+    "<parameter_name>": "<value>"
+  }
+}
+</nexuss_tool_call>
+
+You may also call multiple tools simultaneously:
+<nexuss_tool_call>
+[
+  { "tool": "list_files", "parameters": { "path": "." } },
+  { "tool": "read_file", "parameters": { "path": "package.json" } }
+]
+</nexuss_tool_call>
+
+## Protocol Rules:
+1. When you need workspace information, output the <nexuss_tool_call> block immediately.
+2. The Nexuss Tool Engine will execute the action and return the output inside <nexuss_tool_result> blocks.
+3. After receiving <nexuss_tool_result>, continue your thought process and provide your comprehensive answer to the user.
+`;
+function extractNexussToolCalls(content) {
+  if (!content) return [];
+  const calls = [];
+  const validTools = /* @__PURE__ */ new Set(["read_file", "write_file", "modify_file", "list_files", "glob_files", "grep_files", "delete_file"]);
+  const processJsonPayload = (parsed, raw) => {
+    if (!parsed) return;
+    const items = Array.isArray(parsed) ? parsed : [parsed];
+    for (const item of items) {
+      if (!item || typeof item !== "object") continue;
+      const toolName = item.tool || item.name || item.action || (item.nexuss_tool_call ? item.nexuss_tool_call.tool || item.nexuss_tool_call.name : null);
+      if (toolName && typeof toolName === "string" && validTools.has(toolName.trim())) {
+        let args = item.parameters || item.args || item.arguments || (item.nexuss_tool_call ? item.nexuss_tool_call.parameters || item.nexuss_tool_call.args : null) || item;
+        const cleanArgs = typeof args === "object" && args !== null ? { ...args } : {};
+        delete cleanArgs.tool;
+        delete cleanArgs.name;
+        delete cleanArgs.action;
+        delete cleanArgs.nexuss_tool_call;
+        calls.push({ name: toolName.trim(), args: cleanArgs, rawMatch: raw });
+      }
+    }
+  };
+  const xmlRegex = /<(?:nexuss_tool_call|tool_call|nexuss_action)(?:\s+tool=["']([^"']+)["']|\s+name=["']([^"']+)["'])?>([\s\S]*?)<\/(?:nexuss_tool_call|tool_call|nexuss_action)>/gi;
+  let match;
+  while ((match = xmlRegex.exec(content)) !== null) {
+    const directTool = match[1] || match[2];
+    const body = match[3]?.trim();
+    if (body) {
+      try {
+        const parsed = JSON.parse(body);
+        if (directTool && typeof parsed === "object" && !Array.isArray(parsed)) {
+          parsed.tool = directTool;
+        }
+        processJsonPayload(parsed, match[0]);
+      } catch {
+      }
+    }
+  }
+  const codeBlockRegex = /```(?:nexuss_tool|tool_call|nexuss_action|nexuss|json_tool)\s*([\s\S]*?)```/gi;
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    const body = match[1]?.trim();
+    if (body) {
+      try {
+        const parsed = JSON.parse(body);
+        processJsonPayload(parsed, match[0]);
+      } catch {
+      }
+    }
+  }
+  if (calls.length === 0) {
+    const jsonBlockRegex = /```(?:json)?\s*([\s\S]*?\{[\s\S]*?\})\s*```/gi;
+    while ((match = jsonBlockRegex.exec(content)) !== null) {
+      const body = match[1]?.trim();
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          processJsonPayload(parsed, match[0]);
+        } catch {
+        }
+      }
+    }
+  }
+  return calls;
+}
+function sanitizeFinalOutput(content) {
+  if (!content) return "";
+  let cleaned = content;
+  cleaned = cleaned.replace(/<(?:nexuss_tool_call|tool_call|nexuss_action)[\s\S]*?<\/(?:nexuss_tool_call|tool_call|nexuss_action)>/gi, "");
+  cleaned = cleaned.replace(/<(?:nexuss_tool_result|tool_result)[\s\S]*?<\/(?:nexuss_tool_result|tool_result)>/gi, "");
+  cleaned = cleaned.replace(/```(?:nexuss_tool|tool_call|nexuss_action|nexuss|json_tool)[\s\S]*?```/gi, "");
+  return cleaned.trim();
+}
 async function callOmniRouteChat({
   messages,
-  model = "auto",
   systemInstruction,
   temperature = 0.7,
-  useTools = true
+  signal
 }) {
-  const workingMessages = [];
-  if (systemInstruction) {
-    workingMessages.push({ role: "system", content: systemInstruction });
-  }
-  for (const m of messages) {
-    workingMessages.push({
+  const fullSystemInstruction = `${systemInstruction || "You are Nexuss AI, a high-performance intelligence assistant."}
+
+${NEXUSS_TOOL_PROTOCOL_SPEC}`;
+  const workingMessages = [
+    { role: "system", content: fullSystemInstruction },
+    ...messages.map((m) => ({
       role: m.role === "model" ? "assistant" : m.role,
       content: m.content || ""
-    });
-  }
-  let targetModel = model;
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const payload = {
-      model: targetModel,
-      messages: workingMessages,
-      temperature
-    };
-    if (useTools) {
-      payload.tools = openAiTools;
+    }))
+  ];
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    if (signal?.aborted) {
+      throw new Error("Request aborted by user");
     }
-    let response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OMNIROUTE_AI_API_KEY}`,
-        "Content-Type": "application/json",
-        "x-omniroute-forwarded": "1"
-      },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok && targetModel !== "auto") {
-      targetModel = "auto";
-      payload.model = "auto";
-      response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${OMNIROUTE_AI_API_KEY}`,
-          "Content-Type": "application/json",
-          "x-omniroute-forwarded": "1"
-        },
-        body: JSON.stringify(payload)
-      });
-    }
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gateway ${response.status}: ${errText.slice(0, 300)}`);
-    }
-    const data = await response.json();
-    const choice = data.choices?.[0];
-    const message = choice?.message;
-    if (!message) {
-      throw new Error("Gateway returned an empty response");
-    }
-    const toolCalls = message.tool_calls;
-    if (!toolCalls || toolCalls.length === 0) {
-      const text = message.content || message.reasoning || "";
-      return {
-        text: text.trim() || "I processed your request, but received an empty response."
+    let toolCycle = 0;
+    let modelSucceeded = false;
+    let finalAnswer = "";
+    while (toolCycle < 6) {
+      if (signal?.aborted) throw new Error("Request aborted by user");
+      const payload = {
+        model: "auto",
+        messages: workingMessages,
+        temperature
       };
+      try {
+        let fetchSignal;
+        if (signal) {
+          fetchSignal = AbortSignal.any ? AbortSignal.any([signal, AbortSignal.timeout(45e3)]) : signal;
+        } else {
+          fetchSignal = AbortSignal.timeout(45e3);
+        }
+        const response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${OMNIROUTE_AI_API_KEY}`,
+            "Content-Type": "application/json",
+            "x-omniroute-forwarded": "1"
+          },
+          body: JSON.stringify(payload),
+          signal: fetchSignal
+        });
+        if (!response.ok) {
+          const errText = await response.text().catch(() => "");
+          console.warn(`Gateway status ${response.status} for model auto (attempt ${attempt}): ${errText.slice(0, 120)}`);
+          break;
+        }
+        const data = await response.json();
+        const choice = data.choices?.[0];
+        const message = choice?.message;
+        if (!message) {
+          break;
+        }
+        const rawText = message.content || message.reasoning || "";
+        const nativeToolCalls = message.tool_calls;
+        const textToolCalls = extractNexussToolCalls(rawText);
+        const hasNativeCalls = Array.isArray(nativeToolCalls) && nativeToolCalls.length > 0;
+        const hasTextCalls = textToolCalls.length > 0;
+        if (!hasNativeCalls && !hasTextCalls) {
+          const cleanOutput = sanitizeFinalOutput(rawText) || rawText;
+          if (cleanOutput && cleanOutput.trim().length > 0) {
+            finalAnswer = cleanOutput.trim();
+            modelSucceeded = true;
+            break;
+          }
+        }
+        toolCycle += 1;
+        workingMessages.push(message);
+        if (hasNativeCalls) {
+          for (const toolCall of nativeToolCalls) {
+            const fnName = toolCall.function?.name;
+            let fnArgs = {};
+            try {
+              fnArgs = JSON.parse(toolCall.function?.arguments || "{}");
+            } catch {
+              fnArgs = {};
+            }
+            try {
+              const result = await callFilesystemKit(fnName, fnArgs);
+              const resultStr = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+              workingMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: resultStr
+              });
+            } catch (err) {
+              workingMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: JSON.stringify({ error: err.message })
+              });
+            }
+          }
+        }
+        if (hasTextCalls) {
+          let toolResultsBlock = "";
+          for (const call of textToolCalls) {
+            try {
+              const result = await callFilesystemKit(call.name, call.args);
+              const resultStr = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+              toolResultsBlock += `
+<nexuss_tool_result tool="${call.name}" status="success">
+${resultStr}
+</nexuss_tool_result>`;
+            } catch (err) {
+              toolResultsBlock += `
+<nexuss_tool_result tool="${call.name}" status="error">
+Error: ${err.message}
+</nexuss_tool_result>`;
+            }
+          }
+          workingMessages.push({
+            role: "user",
+            content: `Nexuss Tool Execution Output:${toolResultsBlock}
+
+Please proceed with your analysis and deliver the response to the user.`
+          });
+        }
+      } catch (fetchErr) {
+        if (fetchErr?.name === "AbortError" || signal?.aborted) {
+          throw new Error("Request aborted by user");
+        }
+        console.warn(`Gateway auto request error (attempt ${attempt}):`, fetchErr?.message);
+        break;
+      }
     }
-    workingMessages.push(message);
-    for (const toolCall of toolCalls) {
-      const fnName = toolCall.function?.name;
-      let fnArgs = {};
-      try {
-        fnArgs = JSON.parse(toolCall.function?.arguments || "{}");
-      } catch {
-        fnArgs = {};
-      }
-      try {
-        const result = await callFilesystemKit(fnName, fnArgs);
-        workingMessages.push({
-          role: "tool",
-          tool_call_id: toolCall.id,
-          content: typeof result === "string" ? result : JSON.stringify(result)
-        });
-      } catch (err) {
-        workingMessages.push({
-          role: "tool",
-          tool_call_id: toolCall.id,
-          content: JSON.stringify({ error: err.message })
-        });
-      }
+    if (modelSucceeded && finalAnswer) {
+      return { text: finalAnswer };
+    }
+    if (attempt < maxAttempts) {
+      await new Promise((r) => setTimeout(r, 1e3));
     }
   }
-  throw new Error("Tool execution loop exceeded maximum steps");
+  throw new Error("OmniRouter auto gateway currently unavailable");
 }
-var generateFallback = (prompt, isDeep) => {
-  const lower = prompt.toLowerCase();
-  if (lower.includes("sprint plan") || lower.includes("7-day") || lower.includes("agile")) {
-    return `### 7-Day Sprint Plan: Product Velocity & Execution
-
-Here is a structured, high-efficiency sprint blueprint designed for maximum throughput and minimal overhead:
-
----
-
-#### **Sprint Cadence & Milestones**
-
-| Day | Focus Area | Key Deliverables & Checkpoints |
-|---|---|---|
-| **Day 1** | Sprint Kickoff & Alignment | \u2022 Finalize backlog grooming & scope freeze<br>\u2022 Technical spike reviews & API contract lock |
-| **Day 2** | Architecture & Core Logic | \u2022 Data schema migrations & foundational components<br>\u2022 Draft integration tests & CI pipelines |
-| **Day 3** | Feature Implementation (P0) | \u2022 Build core user workflows & high-impact tickets<br>\u2022 EOD internal sync on blockers |
-| **Day 4** | Secondary Features & Edge Cases | \u2022 Complete UI edge cases, error states, and responsive styling<br>\u2022 Begin code review wave 1 |
-| **Day 5** | Integration & Hardening | \u2022 End-to-end integration tests & security checks<br>\u2022 Polish visual micro-interactions & copy |
-| **Day 6** | QA Bug Bash & Staging Validation | \u2022 Cross-browser testing, accessibility audit<br>\u2022 Load testing & staging environment sign-off |
-| **Day 7** | Release Deployment & Retro | \u2022 Zero-downtime production deployment<br>\u2022 Team retrospective: metrics, velocity, action items |
-
----
-
-#### **Critical Success Factors**
-1. **Scope Protection:** Strict freeze on new additions post Day 1 standup.
-2. **Async Unblocking:** 15-minute SLA on PR reviews for P0 branch blockers.
-3. **Automated Verification:** Continuous testing on PR merge to prevent regression.`;
-  }
-  if (lower.includes("tagline") || lower.includes("brand") || lower.includes("sustainable")) {
-    return `### Brand Taglines: Sustainable Fashion Line
-
-Here are 3 refined, memorable brand directions crafted for resonance, clarity, and narrative depth:
-
----
-
-#### 1. **"Woven for Tomorrow. Worn Today."**
-* **Tone:** Forward-looking, conscious, timeless.
-* **Demographic Appeal:** Eco-conscious professionals & minimalist lifestyle enthusiasts.
-* **Brand Narrative:** Positions every garment as an investment in longevity rather than fast-fashion obsolescence.
-
-#### 2. **"Pure Origin. Uncompromising Form."**
-* **Tone:** Refined, architectural, premium.
-* **Demographic Appeal:** Contemporary luxury seekers prioritizing ethical provenance.
-* **Brand Narrative:** Celebrates regenerative materials matched with sharp, high-tailored aesthetics.
-
-#### 3. **"Trace Every Thread."**
-* **Tone:** Honest, radical transparency, direct.
-* **Demographic Appeal:** Gen Z & Millennial consumers who demand radical supply-chain accountability.
-* **Brand Narrative:** Establishes trust by turning lifecycle visibility into a primary badge of craftsmanship.`;
-  }
-  if (lower.includes("gdpr") || lower.includes("ccpa") || lower.includes("privacy")) {
-    return `### Regulatory Comparison: GDPR vs. CCPA / CPRA
-
-A structural side-by-side analysis of the European Union's GDPR and California's Consumer Privacy Act (CCPA/CPRA):
-
----
-
-| Dimension | GDPR (European Union) | CCPA / CPRA (California, USA) |
-|---|---|---|
-| **Territorial Scope** | Applies globally to any entity processing data of EU residents. | Applies to for-profit entities doing business in CA exceeding revenue/data thresholds ($25M+ gross revenue or 100k+ consumers). |
-| **Consent Model** | **Opt-In Default:** Explicit, affirmative opt-in required prior to non-essential processing. | **Opt-Out Default:** Notice at collection; explicit right to opt out of data "sale" or "sharing". |
-| **Right to Delete** | Broad "Right to be Forgotten" with narrow exceptions. | Right to delete personal info collected directly, subject to business necessity exemptions. |
-| **Sensitive Data** | Special categories (biometric, health, political) prohibited without explicit derogation. | Consumers can limit the use of Sensitive Personal Information (SPI) via dedicated toggle. |
-| **Maximum Penalties** | Up to **\u20AC20M or 4% of annual global turnover**, whichever is higher. | Up to **$2,500 per unintentional violation** / **$7,500 per intentional violation**; private right of action for data breaches ($100\u2013$750 per consumer). |
-
----
-
-#### **Key Implementation Takeaway**
-Engineering teams targeting global compliance should design to **GDPR standards by default** (strict opt-in consent and centralized data inventory) while implementing California-specific "Do Not Sell/Share My Personal Information" endpoints.`;
-  }
-  if (isDeep) {
-    return `### Strategic Synthesis & Deep Analysis
-
-**Objective:** Thorough investigation and multi-perspective deconstruction of your query.
-
----
-
-#### **Executive Summary**
-1. **Context & Foundation:** Evaluating the principal trade-offs and structural dependencies.
-2. **Core Mechanics:** Identifying high-leverage intervention points and potential bottlenecks.
-3. **Execution Pathway:** Outlining an actionable roadmap with clear stage gates.
-
----
-
-#### **Analytical Framework**
-* **High Efficiency:** Minimize cognitive overhead through automated pipelines.
-* **Resilient Architecture:** Decouple monolithic workflows into deterministic modules.
-* **Verification Loop:** Continuous benchmarking against measurable performance indicators.
-
-Would you like to drill down into a specific technical aspect or generate concrete implementation assets?`;
-  }
-  return `### Nexuss AI Analysis
-
-Thank you for your inquiry. Here is a clear, structured breakdown:
-
-1. **Clarity & Focus:** Every initiative benefits from well-defined constraints and clear success criteria.
-2. **Immediate Next Step:** Prioritize the highest-leverage task to create immediate forward momentum.
-3. **Iterative Refinement:** Execute quickly, measure impact, and adjust based on feedback.
-
-How would you like to build on this?`;
-};
 app.post("/api/chat", async (req, res) => {
   try {
     const {
@@ -24563,50 +25062,129 @@ app.post("/api/chat", async (req, res) => {
     if (conversationList.length === 0) {
       return res.status(400).json({ error: "No prompt or messages provided" });
     }
-    const lastUserMessage = [...conversationList].reverse().find((m) => m.role === "user");
-    const userPrompt = lastUserMessage?.content || prompt || "";
     const defaultSystemInstruction = `You are Nexuss AI, a minimal, ultra-clean, and high-performance AI assistant.
 Your communication style is intelligent, polished, structured, and direct.
 ${deepResearch ? "DEEPER RESEARCH MODE IS ENABLED: Provide an exhaustive, multi-faceted analysis with Executive Summary, Core Findings, Structural Comparison / Data, and Concrete Action Items." : "Provide clear, concise, and beautifully organized answers."}
 ${webSearch ? "Incorporate up-to-date real-world context and structured citations where applicable." : ""}
-Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.
-You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
-    const systemInstruction = `${customSystemInstruction || defaultSystemInstruction}
-You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
-    if (OMNIROUTE_AI_API_KEY) {
-      try {
-        const omniResult = await callOmniRouteChat({
-          messages: conversationList,
-          model: "auto",
-          systemInstruction,
-          temperature: deepResearch ? 0.3 : 0.7,
-          useTools: true
+Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.`;
+    const systemInstruction = customSystemInstruction || defaultSystemInstruction;
+    try {
+      const omniResult = await callOmniRouteChat({
+        messages: conversationList,
+        systemInstruction,
+        temperature: deepResearch ? 0.3 : 0.7
+      });
+      if (omniResult && omniResult.text) {
+        return res.json({
+          role: "assistant",
+          content: omniResult.text,
+          text: omniResult.text,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
         });
-        if (omniResult && omniResult.text) {
-          return res.json({
-            role: "assistant",
-            content: omniResult.text,
-            text: omniResult.text,
-            timestamp: (/* @__PURE__ */ new Date()).toISOString()
-          });
-        }
-      } catch (omniError) {
-        console.warn("Gateway request error, activating structured fallback:", omniError?.message || omniError);
       }
+    } catch (omniError) {
+      console.warn("OmniRouter auto gateway error:", omniError?.message || omniError);
     }
-    const reply = generateFallback(userPrompt, Boolean(deepResearch));
-    return res.json({
-      role: "assistant",
-      content: reply,
-      text: reply,
-      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    return res.status(503).json({
+      error: "OmniRouter gateway temporarily busy, retrying connection...",
+      retryable: true
     });
   } catch (err) {
     console.error("Server error handling chat:", err);
     return res.status(500).json({
-      error: "An internal error occurred while generating response.",
+      error: "Error processing request, retrying...",
+      retryable: true,
       details: err?.message
     });
+  }
+});
+app.get("/api/list", (req, res) => {
+  try {
+    const result = localListFiles({
+      path: req.query.path || ".",
+      all: req.query.all === "true"
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: "request_error", message: err.message });
+  }
+});
+app.get("/api/read", (req, res) => {
+  try {
+    const result = localReadFile({
+      path: req.query.path || "",
+      head: req.query.head ? Number(req.query.head) : void 0,
+      tail: req.query.tail ? Number(req.query.tail) : void 0,
+      start: req.query.start ? Number(req.query.start) : void 0,
+      end: req.query.end ? Number(req.query.end) : void 0
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(404).json({ error: "not_found", message: err.message });
+  }
+});
+app.put("/api/write", (req, res) => {
+  try {
+    const result = localWriteFile({
+      path: req.body?.path || req.query.path || "",
+      content: req.body?.content ?? "",
+      append: req.body?.append ?? req.query.append === "true"
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: "write_error", message: err.message });
+  }
+});
+app.patch("/api/modify", (req, res) => {
+  try {
+    const result = localModifyFile({
+      path: req.body?.path || req.query.path || "",
+      old_str: req.body?.old_str || req.body?.match || req.body?.find,
+      new_str: req.body?.new_str || req.body?.replacement || req.body?.replace,
+      match: req.body?.match,
+      replacement: req.body?.replacement,
+      find: req.body?.find,
+      replace: req.body?.replace,
+      edits: req.body?.edits
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: "modify_error", message: err.message });
+  }
+});
+app.get("/api/glob", (req, res) => {
+  try {
+    const result = localGlobFiles({
+      pattern: req.query.pattern || "*",
+      path: req.query.path || req.query.cwd || "."
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: "glob_error", message: err.message });
+  }
+});
+app.get("/api/grep", (req, res) => {
+  try {
+    const result = localGrepFiles({
+      pattern: req.query.pattern || "",
+      path: req.query.path || ".",
+      ignoreCase: req.query.ignoreCase !== "false",
+      all: req.query.all === "true"
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: "grep_error", message: err.message });
+  }
+});
+app.delete("/api/delete", (req, res) => {
+  try {
+    const result = localDeleteFile({
+      path: req.query.path || req.body?.path || "",
+      recursive: req.query.recursive === "true" || Boolean(req.body?.recursive)
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: "delete_error", message: err.message });
   }
 });
 app.get("/api/health", (req, res) => {
@@ -24636,6 +25214,10 @@ async function startServer() {
   });
 }
 startServer();
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  NEXUSS_TOOL_REGISTRY
+});
 /*! Bundled license information:
 
 depd/index.js:
