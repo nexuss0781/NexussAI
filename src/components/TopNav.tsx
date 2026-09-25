@@ -71,10 +71,10 @@ export const TopNav: React.FC<TopNavProps> = ({
         )}
       </div>
 
-      {/* CENTER: Brand Nexuss AI with unique bespoke typography */}
+      {/* CENTER: Brand Nexuss AI - Professional, formal, single font */}
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none select-none">
-        <span className="font-['Outfit',sans-serif] text-base sm:text-lg font-semibold tracking-tight bg-gradient-to-r from-zinc-100 via-white to-zinc-300 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(255,255,255,0.12)]">
-          Nexuss <span className="font-['Instrument_Serif',serif] italic font-normal text-violet-400 text-lg sm:text-xl ml-0.5 tracking-normal">AI</span>
+        <span className="font-semibold text-sm sm:text-[15px] tracking-tight text-zinc-100">
+          Nexuss AI
         </span>
       </div>
 
