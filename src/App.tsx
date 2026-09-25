@@ -191,6 +191,8 @@ export default function App() {
         id: `msg-${Date.now() + 1}`,
         role: 'assistant',
         content: assistantText,
+        model: data.model || currentModel,
+        provider: data.provider || 'OmniRoute Gateway',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isDeepResearch: options.deepResearch,
         isWebSearch: options.webSearch,

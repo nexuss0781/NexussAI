@@ -4,6 +4,7 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
   model?: string;
+  provider?: string;
   isDeepResearch?: boolean;
   isWebSearch?: boolean;
   attachments?: { name: string; size: string; type: string }[];

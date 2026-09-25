@@ -50,24 +50,52 @@ export const TopNav: React.FC<TopNavProps> = ({
 
   const models = [
     { 
-      id: 'gemini-3.8-flash', 
-      label: 'Nexuss 3.8 Flash', 
-      desc: 'Balanced speed, reasoning & deep multimodal capabilities',
-      badge: 'Default',
-      icon: Cpu
+      id: 'auto', 
+      label: 'OmniRoute Auto', 
+      desc: 'Intelligent multi-model dynamic router across top frontier providers',
+      badge: 'Smart',
+      icon: Sparkles
     },
     { 
-      id: 'gemini-3.1-pro', 
-      label: 'Nexuss 3.1 Pro', 
-      desc: 'Maximized cognitive reasoning for advanced math & code',
-      badge: 'Pro',
-      icon: Zap
+      id: 'gemini-3.8-flash', 
+      label: 'Nexuss 3.8 Flash', 
+      desc: 'Ultra-fast low-latency responses & deep context reasoning',
+      badge: 'Fast',
+      icon: Cpu
     },
     { 
       id: 'deep-research', 
       label: 'Deep Research Agent', 
-      desc: 'Autonomous multi-step grounding & comprehensive synthesis',
-      badge: 'Deep',
+      desc: 'Extended chain-of-thought analysis with multi-angle synthesis',
+      badge: 'Reasoning',
+      icon: Zap
+    },
+    { 
+      id: 'gemini-3.1-pro', 
+      label: 'Nexuss 3.1 Pro', 
+      desc: 'Maximized cognitive reasoning for complex system design & code',
+      badge: 'Pro',
+      icon: Cpu
+    },
+    { 
+      id: 'claude-3-5-sonnet', 
+      label: 'Claude 3.5 Sonnet', 
+      desc: 'Anthropic state-of-the-art coding and nuanced analytical writing',
+      badge: 'Anthropic',
+      icon: Sparkles
+    },
+    { 
+      id: 'deepseek-chat', 
+      label: 'DeepSeek V3', 
+      desc: 'High throughput MoE architecture for coding & technical tasks',
+      badge: 'DeepSeek',
+      icon: Zap
+    },
+    { 
+      id: 'gpt-4o', 
+      label: 'GPT-4o Omnimodal', 
+      desc: 'OpenAI flagship multi-modal reasoning through OmniRoute Gateway',
+      badge: 'OpenAI',
       icon: Sparkles
     }
   ];

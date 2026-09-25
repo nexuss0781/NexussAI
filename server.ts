@@ -24,7 +24,10 @@ const getGeminiClient = async () => {
   });
 };
 
+const OMNIROUTE_BASE_URL = (process.env.OMNIROUTE_BASE_URL || 'https://omniouter-vercel.vercel.app').replace(/\/+$/, '');
+const OMNIROUTE_AI_API_KEY = (process.env.OMNIROUTE_AI_API_KEY || 'my-super-secret-gateway-token-123').trim();
 const FILESYSTEM_KIT_URL = (process.env.FILESYSTEM_KIT_URL || 'https://filesystem-kit.wasmer.app').replace(/\/$/, '');
+
 const filesystemToolDeclarations = [
   { name: 'read_file', description: 'Read a text file from the connected workspace. Use this before editing.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, head: { type: 'integer' }, tail: { type: 'integer' }, start: { type: 'integer' }, end: { type: 'integer' } }, required: ['path'] } },
   { name: 'write_file', description: 'Create or replace a text file in the connected workspace.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' }, append: { type: 'boolean' }, range: { type: 'object', properties: { start: { type: 'integer' }, end: { type: 'integer' } }, required: ['start', 'end'] } }, required: ['path', 'content'] } },
@@ -34,6 +37,15 @@ const filesystemToolDeclarations = [
   { name: 'grep_files', description: 'Search text lines in a workspace file or directory.', parametersJsonSchema: { type: 'object', properties: { pattern: { type: 'string' }, path: { type: 'string' }, ignoreCase: { type: 'boolean' }, all: { type: 'boolean' } }, required: ['pattern'] } },
   { name: 'delete_file', description: 'Delete a workspace file or directory. Only use when explicitly requested.', parametersJsonSchema: { type: 'object', properties: { path: { type: 'string' }, recursive: { type: 'boolean' }, force: { type: 'boolean' } }, required: ['path'] } },
 ];
+
+const openAiTools = filesystemToolDeclarations.map(tool => ({
+  type: 'function',
+  function: {
+    name: tool.name,
+    description: tool.description,
+    parameters: tool.parametersJsonSchema,
+  },
+}));
 
 async function callFilesystemKit(name: string, args: Record<string, any>) {
   const request = async (endpoint: string, init?: RequestInit) => {
@@ -53,6 +65,125 @@ async function callFilesystemKit(name: string, args: Record<string, any>) {
     case 'delete_file': return request(`/api/delete?${query(args)}`, { method: 'DELETE' });
     default: throw new Error(`Unknown filesystem tool: ${name}`);
   }
+}
+
+// OmniRoute AI Gateway Chat caller with autonomous tool execution loop
+async function callOmniRouteChat({
+  messages,
+  model = 'auto',
+  systemInstruction,
+  temperature = 0.7,
+  useTools = true,
+}: {
+  messages: Array<{ role: string; content: string }>;
+  model?: string;
+  systemInstruction?: string;
+  temperature?: number;
+  useTools?: boolean;
+}): Promise<{ text: string; model: string; provider: string }> {
+  const workingMessages: any[] = [];
+  if (systemInstruction) {
+    workingMessages.push({ role: 'system', content: systemInstruction });
+  }
+
+  for (const m of messages) {
+    workingMessages.push({
+      role: m.role === 'model' ? 'assistant' : m.role,
+      content: m.content || '',
+    });
+  }
+
+  let targetModel = model;
+
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const payload: any = {
+      model: targetModel,
+      messages: workingMessages,
+      temperature,
+    };
+    if (useTools) {
+      payload.tools = openAiTools;
+    }
+
+    let response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
+        'Content-Type': 'application/json',
+        'x-omniroute-forwarded': '1',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // If specific model fails or returns error, retry with 'auto'
+    if (!response.ok && targetModel !== 'auto') {
+      console.warn(`OmniRoute model '${targetModel}' returned HTTP ${response.status}. Retrying with 'auto'...`);
+      targetModel = 'auto';
+      payload.model = 'auto';
+      response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
+          'Content-Type': 'application/json',
+          'x-omniroute-forwarded': '1',
+        },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`OmniRoute ${response.status}: ${errText.slice(0, 300)}`);
+    }
+
+    const data: any = await response.json();
+    const choice = data.choices?.[0];
+    const message = choice?.message;
+    if (!message) {
+      throw new Error('OmniRoute returned an empty choices payload');
+    }
+
+    const toolCalls = message.tool_calls;
+    if (!toolCalls || toolCalls.length === 0) {
+      const text = message.content || message.reasoning || '';
+      return {
+        text: text.trim() || 'I processed your request, but received an empty response.',
+        model: data.model || targetModel,
+        provider: data.provider || 'OmniRoute Gateway',
+      };
+    }
+
+    // Append model's tool calls to conversational messages
+    workingMessages.push(message);
+
+    // Execute each tool call against Filesystem Kit
+    for (const toolCall of toolCalls) {
+      const fnName = toolCall.function?.name;
+      let fnArgs: any = {};
+      try {
+        fnArgs = JSON.parse(toolCall.function?.arguments || '{}');
+      } catch {
+        fnArgs = {};
+      }
+
+      try {
+        const result = await callFilesystemKit(fnName, fnArgs);
+        workingMessages.push({
+          role: 'tool',
+          tool_call_id: toolCall.id,
+          content: typeof result === 'string' ? result : JSON.stringify(result),
+        });
+      } catch (err: any) {
+        workingMessages.push({
+          role: 'tool',
+          tool_call_id: toolCall.id,
+          content: JSON.stringify({ error: err.message }),
+        });
+      }
+    }
+  }
+
+  throw new Error('OmniRoute tool execution loop exceeded maximum steps');
 }
 
 async function generateWithTools(ai: any, model: string, contents: any[], config: any) {
@@ -123,20 +254,51 @@ app.post('/api/chat', async (req, res) => {
       isWebGroundingNeeded = true;
     }
 
-    const ai = await getGeminiClient();
-
-    if (ai) {
-      try {
-        const defaultSystemInstruction = `You are Nexuss AI, a minimal, ultra-clean, and high-performance AI assistant.
+    const defaultSystemInstruction = `You are Nexuss AI, a minimal, ultra-clean, and high-performance AI assistant.
 Your communication style is intelligent, polished, structured, and direct.
 ${deepResearch || reqModel === 'deep-research' ? 'DEEPER RESEARCH MODE IS ENABLED: Provide an exhaustive, multi-faceted analysis with Executive Summary, Core Findings, Structural Comparison / Data, and Concrete Action Items.' : 'Provide clear, concise, and beautifully organized answers.'}
 ${isWebGroundingNeeded ? 'Incorporate up-to-date real-world context and structured citations where applicable.' : ''}
 Use markdown formatting with bold headings, clean bullet points, code blocks with syntax tags, and concise summaries.
 You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
 
-        const systemInstruction = `${customSystemInstruction || defaultSystemInstruction}
+    const systemInstruction = `${customSystemInstruction || defaultSystemInstruction}
 You are connected to a remote Filesystem Kit workspace. When the user asks you to inspect, create, edit, search, or organize code/files, use the filesystem tools instead of pretending. Read relevant files before editing, make the smallest safe change, and summarize every file operation. Never delete files unless explicitly requested.`;
 
+    // 1. Primary AI Router: OmniRoute AI Gateway
+    if (OMNIROUTE_AI_API_KEY) {
+      try {
+        let omniModel = reqModel || 'auto';
+        if (omniModel === 'gemini-3.8-flash') omniModel = 'auto';
+        else if (omniModel === 'gemini-3.1-pro') omniModel = 'gemini-2.5-pro';
+        else if (omniModel === 'deep-research' || deepResearch) omniModel = 'deepseek-reasoner';
+
+        const omniResult = await callOmniRouteChat({
+          messages: conversationList,
+          model: omniModel,
+          systemInstruction,
+          temperature: deepResearch ? 0.3 : 0.7,
+          useTools: true,
+        });
+
+        if (omniResult && omniResult.text) {
+          return res.json({
+            role: 'assistant',
+            content: omniResult.text,
+            text: omniResult.text,
+            model: omniResult.model || reqModel,
+            provider: omniResult.provider || 'OmniRoute Gateway',
+            timestamp: new Date().toISOString(),
+          });
+        }
+      } catch (omniError: any) {
+        console.warn('OmniRoute Gateway request failed, attempting Gemini fallback:', omniError?.message || omniError);
+      }
+    }
+
+    const ai = await getGeminiClient();
+
+    if (ai) {
+      try {
         // Format conversational history for Gemini
         const formattedContents = conversationList.map(m => ({
           role: m.role === 'model' || m.role === 'assistant' ? 'model' : 'user',
@@ -159,6 +321,7 @@ You are connected to a remote Filesystem Kit workspace. When the user asks you t
           content: replyText,
           text: replyText,
           model: reqModel,
+          provider: 'Google Gemini',
           timestamp: new Date().toISOString(),
         });
       } catch (geminiError: any) {
@@ -332,11 +495,63 @@ Feel free to expand on any specific facet or select **Deeper Research** for an e
   }
 });
 
+// Models Listing API
+app.get('/api/models', async (req, res) => {
+  try {
+    if (OMNIROUTE_AI_API_KEY) {
+      const response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/models`, {
+        headers: {
+          'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
+          'x-omniroute-forwarded': '1',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return res.json(data);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch OmniRoute models:', err);
+  }
+  return res.json({
+    object: 'list',
+    data: [
+      { id: 'auto', label: 'OmniRoute Auto Router' },
+      { id: 'gemini-3.8-flash', label: 'Nexuss 3.8 Flash' },
+      { id: 'gemini-3.1-pro', label: 'Nexuss 3.1 Pro' },
+      { id: 'deep-research', label: 'Deep Research Agent' },
+      { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+      { id: 'deepseek-chat', label: 'DeepSeek V3' },
+      { id: 'deepseek-reasoner', label: 'DeepSeek R1 Reasoner' },
+      { id: 'gpt-4o', label: 'GPT-4o Omnimodal' },
+    ],
+  });
+});
+
 // App Health
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  let omnirouteLive = false;
+  try {
+    const r = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/models`, {
+      headers: {
+        'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
+        'x-omniroute-forwarded': '1',
+      },
+      signal: AbortSignal.timeout(3000),
+    });
+    omnirouteLive = r.ok;
+  } catch {
+    // Ignore timeout
+  }
+
   res.json({
     status: 'ok',
     brand: 'Nexuss AI',
+    gateway: {
+      provider: 'OmniRoute AI Gateway',
+      live: omnirouteLive,
+      baseUrl: OMNIROUTE_BASE_URL,
+    },
     timestamp: new Date().toISOString(),
   });
 });
