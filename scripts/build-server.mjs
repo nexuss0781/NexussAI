@@ -10,10 +10,10 @@ const nodeBuiltins = [
   'string_decoder', 'timers', 'tls', 'tty', 'url', 'util', 'v8', 'vm', 'worker_threads', 'zlib',
 ];
 
-// express/dotenv/vite come from the deployment's node_modules. The NAR SDK is deliberately
-// NOT external: it is ESM-only, so it is compiled into this CommonJS bundle rather than
-// require()d at runtime, which keeps the edge start free of ESM/CJS interop.
-const external = ['express', 'dotenv', 'vite', ...nodeBuiltins, ...nodeBuiltins.map((n) => `node:${n}`)];
+// Only Node builtins and vite stay external. express, dotenv and the NAR SDK are compiled
+// in so the bundle is self-contained: the deployed webc carries no node_modules, so a
+// bare require() of express would crash the process at boot.
+const external = ['vite', ...nodeBuiltins, ...nodeBuiltins.map((n) => `node:${n}`)];
 
 await build({
   entryPoints: [path.join(root, 'server.ts')],
