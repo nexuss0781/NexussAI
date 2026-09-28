@@ -1,12 +1,13 @@
 [package]
 name = 'nexuss0781/nexussai'
-version = '0.1.28'
+version = '0.1.29'
 description = 'Nexuss AI autonomous agent with Filesystem Kit integration'
 entrypoint = 'node src/server.cjs'
 private = true
 
 [fs]
-'/public' = 'dist'
+'/app/dist' = 'dist'
+'/app/src' = 'src'
 
 [env]
 NAR_BASE_URL = 'https://omniouter-vercel.vercel.app'
