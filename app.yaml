@@ -17,7 +17,7 @@ annotations:
     edgejs_enable: true
     edgejs_precompile: true
     name: out
-        node_build_command: npm run build
+    node_build_command: npm run build
     node_framework: vite
     node_install_inputs:
     - package.json
