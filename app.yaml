@@ -5,8 +5,9 @@ owner: nexuss0781
 package: .
 env:
   FILESYSTEM_KIT_URL: https://filesystem-kit.wasmer.app
-  OMNIROUTE_BASE_URL: https://omniouter-vercel.vercel.app
-  OMNIROUTE_AI_API_KEY: my-super-secret-gateway-token-123
+  NAR_BASE_URL: https://omniouter-vercel.vercel.app
+  NAR_API_KEY: my-super-secret-gateway-token-123
+  NAR_MODEL: auto
   NODE_ENV: production
   STATIC_DIR: dist
 annotations:
@@ -16,7 +17,7 @@ annotations:
     edgejs_enable: true
     edgejs_precompile: true
     name: out
-    node_build_command: npm run build
+    node_build_command: npm run build:all
     node_framework: vite
     node_install_inputs:
     - package.json

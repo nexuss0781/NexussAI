@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
-import { GoogleGenAI } from '@google/genai';
+import { createClient, NarError, type ChatResult, type Route } from '@nexuss0781/nar';
 
 dotenv.config();
 
@@ -11,9 +11,21 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
-const OMNIROUTE_BASE_URL = (process.env.OMNIROUTE_BASE_URL || 'https://omniouter-vercel.vercel.app').replace(/\/+$/, '');
-const OMNIROUTE_AI_API_KEY = (process.env.OMNIROUTE_AI_API_KEY || 'my-super-secret-gateway-token-123').trim();
+// NAR is an external service consumed as a URL + SDK. We send a request and read back
+// text plus the serving route; how it picks or fails over between providers is its own
+// business and is deliberately not reimplemented here.
+const NAR_BASE_URL = (process.env.NAR_BASE_URL || process.env.OMNIROUTE_BASE_URL || 'https://omniouter-vercel.vercel.app').replace(/\/+$/, '');
+const NAR_API_KEY = (process.env.NAR_API_KEY || process.env.OMNIROUTE_AI_API_KEY || 'my-super-secret-gateway-token-123').trim();
 const FILESYSTEM_KIT_URL = (process.env.FILESYSTEM_KIT_URL || 'https://filesystem-kit.wasmer.app').replace(/\/+$/, '');
+
+// "auto" lets the router select a healthy model per request. Pinning an id would give up
+// automatic selection and leave the conversation stuck if that model later dies.
+const NAR_MODEL = process.env.NAR_MODEL || 'auto';
+const MAX_TOOL_CYCLES = 6;
+const MAX_GATEWAY_RETRIES = 2;
+const GATEWAY_TIMEOUT_MS = Number(process.env.NAR_TIMEOUT_MS) || 45_000;
+
+const nar = createClient({ baseUrl: NAR_BASE_URL, apiKey: NAR_API_KEY });
 
 // ==========================================
 // WORKSPACE RESOLUTION & LOCAL FILESYSTEM ENGINE
@@ -568,6 +580,31 @@ export const NEXUSS_TOOL_REGISTRY: NexussToolDefinition[] = [
   },
 ];
 
+// Models behind NAR are free and small. They emit well-formed NTCP blocks but routinely
+// target the wrong argument, so every call is checked before it reaches the workspace.
+const NEXUSS_TOOL_NAMES = new Set(NEXUSS_TOOL_REGISTRY.map((tool) => tool.name));
+
+type ToolValidation = { ok: true; args: Record<string, any> } | { ok: false; reason: string };
+
+function validateNexussToolCall(name: string, args: Record<string, any>): ToolValidation {
+  if (!name || !NEXUSS_TOOL_NAMES.has(name)) {
+    return { ok: false, reason: `unknown tool "${name ?? ''}"` };
+  }
+  if (!args || typeof args !== 'object' || Array.isArray(args)) {
+    return { ok: false, reason: `parameters for "${name}" were not an object` };
+  }
+
+  const definition = NEXUSS_TOOL_REGISTRY.find((tool) => tool.name === name)!;
+  for (const field of definition.parameters.required || []) {
+    if (definition.parameters.properties[field]?.type !== 'string') continue;
+    const value = args[field];
+    if (typeof value !== 'string' || value.trim() === '') {
+      return { ok: false, reason: `"${name}" requires a non-empty string "${field}"` };
+    }
+  }
+  return { ok: true, args };
+}
+
 // Pure Nexuss Tool Calling Schema Prompt Standard - Universal across ALL LLM architectures
 const NEXUSS_TOOL_PROTOCOL_SPEC = `
 # NEXUSS PERSISTENT COMPUTER & TOOL CALLING PROTOCOL (NTCP v1.0)
@@ -697,18 +734,108 @@ function sanitizeFinalOutput(content: string): string {
   return cleaned.trim();
 }
 
-// OmniRouter AI Gateway Chat caller using strictly the 'auto' routing model
-async function callOmniRouteChat({
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// NAR has already failed over internally by the time it returns an error, so a 503 means
+// the whole pool was unavailable at that instant. A 401/403 is permanent and is never
+// retried; the browser already owns the long backoff, so the server fails fast.
+function isRetriableGatewayError(err: unknown): boolean {
+  return err instanceof NarError && (err.status === 503 || err.status === 429);
+}
+
+async function narChatOnce(options: {
+  messages: any[];
+  temperature: number;
+  routingClass: 'agent-fast' | 'agent-balanced' | 'quality' | 'auto';
+  signal?: AbortSignal;
+}): Promise<ChatResult> {
+  const deadline = AbortSignal.timeout(GATEWAY_TIMEOUT_MS);
+  const signal = options.signal
+    ? (AbortSignal as any).any([options.signal, deadline])
+    : deadline;
+
+  return nar.chat('', {
+    model: NAR_MODEL,
+    messages: options.messages,
+    temperature: options.temperature,
+    extra: { routing_class: options.routingClass },
+    signal,
+  });
+}
+
+async function narChatWithRetry(
+  options: Parameters<typeof narChatOnce>[0],
+): Promise<ChatResult> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await narChatOnce(options);
+    } catch (err) {
+      if (!isRetriableGatewayError(err) || attempt >= MAX_GATEWAY_RETRIES) throw err;
+      console.warn(`Gateway attempt ${attempt + 1} failed (${(err as NarError).code}); backing off`);
+      await sleep(500 * 2 ** attempt);
+    }
+  }
+}
+
+type GatewayFailure = { status: number; body: Record<string, unknown> };
+
+function describeGatewayError(err: unknown): GatewayFailure {
+  if (err instanceof NarError) {
+    console.error('NAR request failed', { status: err.status, code: err.code, route: err.route });
+    return {
+      status: err.status === 401 || err.status === 403 || err.status === 429 ? err.status : 502,
+      body: {
+        error: 'AI gateway request failed',
+        code: err.code,
+        message: err.message,
+        provider: err.route?.provider ?? null,
+        model: err.route?.model ?? null,
+        attemptTrail: err.route?.attemptTrail ?? null,
+        retryable: err.status === 503 || err.status === 429,
+      },
+    };
+  }
+
+  if ((err as Error)?.message === 'Request aborted by user') {
+    return { status: 499, body: { error: 'Request aborted by user', retryable: false } };
+  }
+
+  console.error('Chat failure', err);
+  return {
+    status: 502,
+    body: { error: 'AI gateway request failed', code: 'gateway_error', message: (err as Error)?.message, retryable: true },
+  };
+}
+
+// Executes one NTCP tool call against the workspace after validating its name and arguments
+async function runNexussTool(name: string, args: Record<string, any>): Promise<{ ok: boolean; content: string }> {
+  const validated = validateNexussToolCall(name, args);
+  if (!validated.ok) {
+    return { ok: false, content: JSON.stringify({ error: `rejected before execution: ${validated.reason}` }) };
+  }
+  try {
+    const result = await callFilesystemKit(name, validated.args);
+    return { ok: true, content: typeof result === 'string' ? result : JSON.stringify(result, null, 2) };
+  } catch (err: any) {
+    return { ok: false, content: JSON.stringify({ error: err?.message || 'tool failed' }) };
+  }
+}
+
+// NAR chat caller. NTCP stays the only tool path: the model emits <nexuss_tool_call>
+// blocks as text, and the loop below executes and feeds results back.
+async function callNarChat({
   messages,
   systemInstruction,
   temperature = 0.7,
+  routingClass = 'agent-balanced',
   signal,
 }: {
   messages: Array<{ role: string; content: string }>;
   systemInstruction?: string;
   temperature?: number;
+  routingClass?: 'agent-fast' | 'agent-balanced' | 'quality' | 'auto';
   signal?: AbortSignal;
-}): Promise<{ text: string }> {
+}): Promise<{ text: string; route: Route }> {
   const fullSystemInstruction = `${systemInstruction || 'You are Nexuss AI, a high-performance intelligence assistant.'}\n\n${NEXUSS_TOOL_PROTOCOL_SPEC}`;
 
   const workingMessages: any[] = [
@@ -719,150 +846,44 @@ async function callOmniRouteChat({
     })),
   ];
 
-  const maxAttempts = 3;
+  let route: Route = { provider: null, model: null, attemptTrail: null };
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    if (signal?.aborted) {
-      throw new Error('Request aborted by user');
-    }
+  for (let toolCycle = 0; toolCycle < MAX_TOOL_CYCLES; toolCycle += 1) {
+    if (signal?.aborted) throw new Error('Request aborted by user');
 
-    // Autonomous Multi-Turn Execution Loop (up to 6 tool cycles)
-    let toolCycle = 0;
-    let modelSucceeded = false;
-    let finalAnswer = '';
+    const result = await narChatWithRetry({ messages: workingMessages, temperature, routingClass, signal });
+    route = result.route;
 
-    while (toolCycle < 6) {
-      if (signal?.aborted) throw new Error('Request aborted by user');
+    const rawText = result.text || '';
+    const textToolCalls = extractNexussToolCalls(rawText);
 
-      const payload: any = {
-        model: 'auto',
-        messages: workingMessages,
-        temperature,
-      };
-
-      try {
-        let fetchSignal: AbortSignal;
-        if (signal) {
-          fetchSignal = (AbortSignal as any).any 
-            ? (AbortSignal as any).any([signal, AbortSignal.timeout(45000)])
-            : signal;
-        } else {
-          fetchSignal = AbortSignal.timeout(45000);
-        }
-
-        const response = await fetch(`${OMNIROUTE_BASE_URL}/api/v1/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OMNIROUTE_AI_API_KEY}`,
-            'Content-Type': 'application/json',
-            'x-omniroute-forwarded': '1',
-          },
-          body: JSON.stringify(payload),
-          signal: fetchSignal,
-        });
-
-        if (!response.ok) {
-          const errText = await response.text().catch(() => '');
-          console.warn(`Gateway status ${response.status} for model auto (attempt ${attempt}): ${errText.slice(0, 120)}`);
-          break; // Retry attempt
-        }
-
-        const data: any = await response.json();
-        const choice = data.choices?.[0];
-        const message = choice?.message;
-        if (!message) {
-          break;
-        }
-
-        const rawText = message.content || message.reasoning || '';
-        const nativeToolCalls = message.tool_calls;
-        const textToolCalls = extractNexussToolCalls(rawText);
-
-        const hasNativeCalls = Array.isArray(nativeToolCalls) && nativeToolCalls.length > 0;
-        const hasTextCalls = textToolCalls.length > 0;
-
-        // If no tool calls requested, we have reached the final user response
-        if (!hasNativeCalls && !hasTextCalls) {
-          const cleanOutput = sanitizeFinalOutput(rawText) || rawText;
-          if (cleanOutput && cleanOutput.trim().length > 0) {
-            finalAnswer = cleanOutput.trim();
-            modelSucceeded = true;
-            break;
-          }
-        }
-
-        // Execute Tools Autonomously
-        toolCycle += 1;
-        workingMessages.push(message);
-
-        // 1. Handle native OpenAI tool calls if returned
-        if (hasNativeCalls) {
-          for (const toolCall of nativeToolCalls) {
-            const fnName = toolCall.function?.name;
-            let fnArgs: any = {};
-            try {
-              fnArgs = JSON.parse(toolCall.function?.arguments || '{}');
-            } catch {
-              fnArgs = {};
-            }
-
-            try {
-              const result = await callFilesystemKit(fnName, fnArgs);
-              const resultStr = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
-              workingMessages.push({
-                role: 'tool',
-                tool_call_id: toolCall.id,
-                content: resultStr,
-              });
-            } catch (err: any) {
-              workingMessages.push({
-                role: 'tool',
-                tool_call_id: toolCall.id,
-                content: JSON.stringify({ error: err.message }),
-              });
-            }
-          }
-        }
-
-        // 2. Handle Nexuss standardized tool calls (NTCP)
-        if (hasTextCalls) {
-          let toolResultsBlock = '';
-          for (const call of textToolCalls) {
-            try {
-              const result = await callFilesystemKit(call.name, call.args);
-              const resultStr = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
-              toolResultsBlock += `\n<nexuss_tool_result tool="${call.name}" status="success">\n${resultStr}\n</nexuss_tool_result>`;
-            } catch (err: any) {
-              toolResultsBlock += `\n<nexuss_tool_result tool="${call.name}" status="error">\nError: ${err.message}\n</nexuss_tool_result>`;
-            }
-          }
-
-          workingMessages.push({
-            role: 'user',
-            content: `Nexuss Tool Execution Output:${toolResultsBlock}\n\nPlease proceed with your analysis and deliver the response to the user.`,
-          });
-        }
-
-      } catch (fetchErr: any) {
-        if (fetchErr?.name === 'AbortError' || signal?.aborted) {
-          throw new Error('Request aborted by user');
-        }
-        console.warn(`Gateway auto request error (attempt ${attempt}):`, fetchErr?.message);
-        break;
+    if (textToolCalls.length === 0) {
+      const cleanOutput = sanitizeFinalOutput(rawText) || rawText;
+      if (cleanOutput.trim().length > 0) {
+        return { text: cleanOutput.trim(), route };
       }
+      // An empty turn is a failed turn, not a reason to loop.
+      break;
     }
 
-    if (modelSucceeded && finalAnswer) {
-      return { text: finalAnswer };
+    workingMessages.push({ role: 'assistant', content: rawText });
+
+    let toolResultsBlock = '';
+    for (const call of textToolCalls) {
+      const { ok, content } = await runNexussTool(call.name, call.args);
+      const status = ok ? 'success' : 'error';
+      toolResultsBlock += `\n<nexuss_tool_result tool="${call.name}" status="${status}">\n${content}\n</nexuss_tool_result>`;
     }
 
-    // Small delay between retry attempts
-    if (attempt < maxAttempts) {
-      await new Promise(r => setTimeout(r, 1000));
-    }
+    workingMessages.push({
+      role: 'user',
+      content: `Nexuss Tool Execution Output:${toolResultsBlock}\n\nPlease proceed with your analysis and deliver the response to the user.`,
+    });
   }
 
-  throw new Error('OmniRouter auto gateway currently unavailable');
+  const failure = new Error('Gateway produced no usable response within the tool budget');
+  (failure as any).route = route;
+  throw failure;
 }
 
 // Conversational Chat Endpoint - Purely OmniRouter 'auto' Model Gateway
@@ -905,31 +926,28 @@ Use markdown formatting with bold headings, clean bullet points, code blocks wit
 
     const systemInstruction = customSystemInstruction || defaultSystemInstruction;
 
-    // Route exclusively through OmniRouter Gateway with 'auto' model routing
     try {
-      const omniResult = await callOmniRouteChat({
+      const result = await callNarChat({
         messages: conversationList,
         systemInstruction,
         temperature: deepResearch ? 0.3 : 0.7,
+        routingClass: deepResearch ? 'quality' : 'agent-fast',
       });
 
-      if (omniResult && omniResult.text) {
-        return res.json({
-          role: 'assistant',
-          content: omniResult.text,
-          text: omniResult.text,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    } catch (omniError: any) {
-      console.warn('OmniRouter auto gateway error:', omniError?.message || omniError);
+      console.log(`served by ${result.route.provider}/${result.route.model}`);
+      return res.json({
+        role: 'assistant',
+        content: result.text,
+        text: result.text,
+        route: { provider: result.route.provider, model: result.route.model },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      // The real failure is reported rather than masked. The browser already retries on
+      // any non-ok response, so retryable is informational here.
+      const { status, body } = describeGatewayError(err);
+      return res.status(status).json(body);
     }
-
-    // Return 503 so client's exponential backoff retry handles reconnect
-    return res.status(503).json({
-      error: 'OmniRouter gateway temporarily busy, retrying connection...',
-      retryable: true,
-    });
   } catch (err: any) {
     console.error('Server error handling chat:', err);
     return res.status(500).json({
@@ -937,6 +955,17 @@ Use markdown formatting with bold headings, clean bullet points, code blocks wit
       retryable: true,
       details: err?.message,
     });
+  }
+});
+
+// Live model ids from NAR, so a pin can be validated before it is sent
+app.get('/api/models', async (req, res) => {
+  try {
+    const models = await nar.models();
+    return res.json({ models, count: models.length });
+  } catch (err) {
+    const { status, body } = describeGatewayError(err);
+    return res.status(status).json(body);
   }
 });
 
@@ -1040,11 +1069,20 @@ app.delete('/api/delete', (req, res) => {
   }
 });
 
-// App Health
-app.get('/api/health', (req, res) => {
+// App Health, plus NAR state to tell "app is down" from "router is degraded"
+app.get('/api/health', async (req, res) => {
+  let gateway: Record<string, unknown>;
+  try {
+    const report = await nar.health();
+    gateway = { status: report.status, ready: report.ready, checks: report.checks };
+  } catch (err: any) {
+    gateway = { status: 'unreachable', ready: false, error: err?.message || 'health check failed' };
+  }
+
   res.json({
     status: 'ok',
     brand: 'Nexuss AI',
+    gateway,
     timestamp: new Date().toISOString(),
   });
 });
