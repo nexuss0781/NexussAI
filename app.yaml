@@ -9,7 +9,7 @@ env:
   NAR_API_KEY: my-super-secret-gateway-token-123
   NAR_MODEL: auto
   NODE_ENV: production
-  STATIC_DIR: dist
+  STATIC_DIR: /app/dist
 annotations:
   anybuild.run/config:
     commands:
